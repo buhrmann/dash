@@ -9,7 +9,7 @@ MONGO_URL = os.environ.get('MONGOHQ_URL')
 if MONGO_URL:
 	# We're on the server, so get MongoHQ instance
 	client = MongoClient(MONGO_URL)
-	db = client[urlparse(MONGO_URL).path[1:]]
+	#db = client[urlparse(MONGO_URL).path[1:]]
 else:
 	# We're local, use localhost db coonection
 	client = MongoClient('localhost', 27017)
@@ -23,9 +23,11 @@ app = Flask(__name__)
 # ------------------------------------------------------------------------
 @app.route('/')
 def index():
-	cursor = db['runs_col'].find({}).sort("startTime", -1).limit(1)
-	return str(cursor[0]['_id'])
-    #return 'Hello World!'
+	if db:
+		cursor = db['runs_col'].find({}).sort("startTime", -1).limit(1)
+		return str(cursor[0]['_id'])
+	else:
+    	return 'No db connection: ' + MONGO_URL + ' ' + urlparse(MONGO_URL).path[1:];
 
 @app.route('/user/')
 @app.route('/user/<username>')
