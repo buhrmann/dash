@@ -1,4 +1,5 @@
 import os
+from urlparse import urlparse
 from flask import Flask, render_template
 from pymongo import MongoClient
 
