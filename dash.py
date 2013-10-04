@@ -19,6 +19,8 @@ else:
 	client = MongoClient('localhost', 27017)
 	db = client['runs_db']
 
+coll_name = "runs_col"	
+
 # Create app
 # ------------------------------------------------------------------------
 app = Flask(__name__)
@@ -28,8 +30,14 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 	if db:
-		cursor = db['runs_col'].find({}).sort("startTime", -1).limit(1)
-		return str(cursor[0]['_id'])
+		if(coll_name in db.collection_names()):
+			cursor = db['runs_col'].find({}).sort("startTime", -1).limit(1)
+			if cursor.count() > 0:
+				return str(cursor[0]['_id'])
+			else:
+				return 'Collection is empty!'
+		else:
+			return 'Collection doesnt exist'
 	else:
 		return 'No db connection: ' + MONGO_URL + ' ' + urlparse(MONGO_URL).path[1:]
 
