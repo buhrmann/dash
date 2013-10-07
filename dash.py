@@ -27,7 +27,7 @@ def runs():
 	if(coll_name in db.collection_names()):
 		return db[coll_name]
 	else:
-		db.createCollection(coll_name)
+		db.create_collection(coll_name)
 		return db[coll_name]
 
 runs = runs()		
