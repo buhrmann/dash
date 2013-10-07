@@ -44,7 +44,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 	if not runs is None:
-		cursor = db['runs_col'].find({}).sort("startTime", -1).limit(1)
+		cursor = runs.find({}).sort("startTime", -1).limit(1)
 		if cursor.count() > 0:
 			return str(cursor[0]['_id'])
 		else:
