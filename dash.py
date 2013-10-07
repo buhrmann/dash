@@ -9,7 +9,7 @@ coll_name = "runs"
 # ------------------------------------------------------------------------
 def connect():
 	MONGO_URL = os.environ.get('MONGOHQ_URL')
-
+	print "Establishing db connection..."
 	if MONGO_URL:
 		# We're on the server, so get MongoHQ instance
 		client = MongoClient(MONGO_URL)
@@ -25,8 +25,10 @@ def connect():
 def runs():
 	db = connect()
 	if(coll_name in db.collection_names()):
+		print "Retrieving runs collection"
 		return db[coll_name]
 	else:
+		print "Creating runs collection"
 		db.create_collection(coll_name)
 		return db[coll_name]
 
