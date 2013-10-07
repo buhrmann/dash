@@ -80,8 +80,6 @@ def index():
 		print ids()
 		print diffids()
 		sync()
-		else:
-			return 'Collection is empty!'
 	else:
 		return 'Collection doesnt exist'
 
