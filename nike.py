@@ -2,8 +2,6 @@ import json, httplib, urllib2
 import datetime
 import sys
 
-import nike
-
 accessToken = "860a6bdb7e7bd3ed0f70a7778cdf723c"
 baseurl = "https://api.nike.com/me/sport/activities/"
 

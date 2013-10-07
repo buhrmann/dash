@@ -3,6 +3,8 @@ from urlparse import urlparse
 from flask import Flask, render_template
 from pymongo import MongoClient
 
+import nike
+
 coll_name = "runs"	
 
 # Connect to DB 
@@ -32,7 +34,38 @@ def runs():
 		db.create_collection(coll_name)
 		return db[coll_name]
 
+
 runs = runs()		
+
+
+
+# ------------------------------------------------------------------------
+def ids():
+	cursor = runs.find({}, {'id' : 1})
+	return [id['_id'] for id in cursor]
+
+# ------------------------------------------------------------------------
+def insert(nid):
+	newrun = nike.getNikeRun(nid)
+	runs.insert(newrun)
+
+# Runs on Nike+ that are not in the local database
+# ------------------------------------------------------------------------
+def diffids():
+	localRuns = Set(ids())
+	nikeRuns = Set(nike.listNikeRuns(200,10))
+	return (nikeRuns - localRuns)
+
+# ------------------------------------------------------------------------
+def sync():
+	missing_runs = diffids()
+	n = len(missing_runs)
+	i = 0
+	for run in missing_runs:
+		i += 1
+		print "Inserting run " + str(i) + " of " + str(n)
+		insert(run)		
+
 
 # Create app
 # ------------------------------------------------------------------------
@@ -44,9 +77,9 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 	if not runs is None:
-		cursor = runs.find({}).sort("startTime", -1).limit(1)
-		if cursor.count() > 0:
-			return str(cursor[0]['_id'])
+		print ids()
+		print diffids()
+		sync()
 		else:
 			return 'Collection is empty!'
 	else:
