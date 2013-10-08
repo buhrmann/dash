@@ -14,6 +14,7 @@ def jsonFromUrl(url):
 		handle = urllib2.urlopen(req)
 	except IOError, e:
 		print "Wrong token or other connectivity problems!"
+		print e
 		sys.exit(1)
 
 	js = json.load(handle)
@@ -28,7 +29,7 @@ def listNikeRuns(max=2, count=2):
 		print "Downloading ids " + str(offset) + " to " + str(offset + count - 1)
 		url = baseurl + "?access_token=" + accessToken + "&count=" + str(count) + "&offset=" + str(offset)
 		js = jsonFromUrl(url)
-		idBatch = [int(act['activityId']) for act in js['data']]
+		idBatch = [str(act['activityId']) for act in js['data']]
 		#idBatch = [act['activityId'] for act in js['data']]
 		ids.extend(idBatch)
 		if(len(idBatch) < count):
@@ -44,7 +45,7 @@ def getNikeRun(runId):
 	jsGps = jsonFromUrl(url)
 
 	run = {}
-	run["_id"] = runId
+	run["nid"] = str(runId)
 	run["gps"] = jsGps["waypoints"]
 
 	# Retrieve meta data
@@ -53,7 +54,7 @@ def getNikeRun(runId):
 
 	startTimeStr = jsMeta["startTime"]
 	startDateTime = datetime.datetime.strptime(startTimeStr, "%Y-%m-%dT%H:%M:%SZ")
-	run["startTime"] = startDateTime
+	run["date"] = startDateTime
 
 	return run
 

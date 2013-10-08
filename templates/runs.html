@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+  {% if data %}
+    <ul id="navigation">
+    {% for run in data %}
+        <li>{{ run.date }} : {{ run.distance|round(1) }} km</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

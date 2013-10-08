@@ -1,0 +1,143 @@
+#container {
+  margin: 0 auto;
+  width: 80%;
+  }
+
+body {
+    background-color: #bbb;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", sans-serif;
+    font-weight: lighter;
+    color: black;
+}
+
+#controls {
+  font-family: sans-serif;
+  width: 100%;
+  float: left;
+  margin-bottom: 30px;
+}
+
+.control {
+  float: left;
+  padding-left: 20px;
+}
+
+.control a {
+  color: black;
+  font-size: 12px;
+  padding: 5px;
+  background: #E2E2E2;
+  cursor: pointer;
+  margin-right: 3px;
+  text-decoration: none;
+  border-radius: 2px;
+}
+
+.control a:hover {
+  text-decoration: underline;
+}
+
+.control a.active {
+  color: white;
+  background: #000;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+    margin-right: 2px;
+}
+
+svg .axis path, 
+svg .axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+
+svg .y2 path,
+svg .y2 line {
+    fill: none;
+    stroke: red;
+    shape-rendering: crispEdges;
+}
+
+svg .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg .bar {
+    fill: black;
+}
+
+svg .bar:hover {
+    fill: white;
+}
+
+svg path.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+svg path.line2 {
+  stroke: red;
+  stroke-width: 1.5px;
+}
+
+path.area {
+  fill: rgba(255, 0, 0, 0.2);
+}
+
+svg .trackpad {
+    fill: rgba(0,0,0,0);
+}
+
+.tip {
+    fill: rgba(255,255,255,0.8);
+    font-family: sans-serif;
+    font-size: 10px;    
+}
+
+svg text.tip{    
+    stroke: black;
+}
+
+.d3-tip {
+  line-height: 1;
+  font: 10px sans-serif;
+  font-weight: bold;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #000;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
