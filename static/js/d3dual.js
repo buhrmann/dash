@@ -1,33 +1,11 @@
 //-------------------------------------------------------------------
-// Setup
-//-------------------------------------------------------------------
-
-var iso = d3.time.format.utc("%Y-%m-%dT%H:%M:%S");
-
-// Activate selector button
-activate = function(group, link){
-  d3.selectAll("#" + group + " a").classed("active", false);
-  d3.select("#" + group + " #" + link).classed("active", true);
-  //console.warn(group, link);
-}
-
-d3.selectAll("#layouts a").on("click", function(d) {
-    newLayout = d3.select(this).attr("id");
-    activate("layouts", newLayout);
-    //myNetwork.toggleLayout(newLayout) // use selected id here...
-	});
-
-//-------------------------------------------------------------------
 // Create bar chart with loaded json data
 //-------------------------------------------------------------------
-d3.json("data/gps.json", function(error, json) {
-	if (error) return console.warn(error);
-	data = json;
+dualFromJson = function(id, data) {
 	//var mu = d3.mean(data, function(d) { return d['elevation']; });
 	//data.forEach(function(d){ d['elevation'] = d['elevation'] - mu; })
-	duallines('#duallines', data, 'cumdist', 'speedsmooth', 'elevation');
-	}
-)
+	duallines('#duallines', data.gps, 'cumdist', 'speedsmooth', 'elevation');
+}
 
 //-------------------------------------------------------------------
 // Bar chart for date indexed data

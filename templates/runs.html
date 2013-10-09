@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
+{% block head %}
+	{{ super() }}
+	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.js')}}></script>
+	<script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3bars.js')}}></script>	
+	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
+{% endblock %}
 {% block content %}
   {% if data %}
-    <ul id="navigation">
-    {% for run in data %}
-        <li>{{ run.date }} : {{ run.distance|round(1) }} km</li>
-    {% endfor %}
-    </ul>
+    <div id="datebars"><h3>Km per day</h3></div>
   {% endif %}
+{% endblock %}
+{% block js_footer %}
+	<script type="text/javascript">barsFromJson("#datebars", {{data|safe}})</script>
 {% endblock %}

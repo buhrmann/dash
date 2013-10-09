@@ -4,6 +4,7 @@ from flask import Flask, render_template
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from sets import Set
+import json
 import datetime
 
 import nike
@@ -55,19 +56,15 @@ def insert(nid):
 
 # Runs on Nike+ that are not in the local database
 # ------------------------------------------------------------------------
-def diffids():
+def diffids(max_ids=250):
 	localRuns = Set(ids())
-	nikeRuns = Set(nike.listNikeRuns(5,5))
+	nikeRuns = Set(nike.listNikeRuns(max_ids, 10))
 	return (nikeRuns - localRuns)
 
 # ------------------------------------------------------------------------
-def sync():
-	missing_nids = diffids()
-	n = len(missing_nids)
-	i = 0
+def sync(max_runs=100):
+	missing_nids = diffids(max_runs)
 	for nid in missing_nids:
-		i += 1
-		print "Inserting run " + str(i) + " of " + str(n)
 		insert(nid)		
 
 # ------------------------------------------------------------------------
@@ -109,15 +106,17 @@ def statsPeriod(s, e):
 # ------------------------------------------------------------------------
 def statsAll():
 	returndic = {"date":1, "stats":1}
-	cursor = runs.find({}, returndic).sort("startTime", 1)
+	cursor = runs.find({}, returndic).sort("date", 1)
 	return [dict(r["stats"], **{"date":r["date"].strftime("%Y-%m-%d")}) for r in cursor]
 
 # ------------------------------------------------------------------------
-def runsForDate(timedate):
+def runForDate(timedate):
 	s = timedate
 	e = s + datetime.timedelta(days=1)
-	cursor = runs.find({"date":{"$gte":s, "$lt":e}}).sort("date",1)
-	return [r for r in cursor]
+	returndic = {"_id":0, "date":1, "stats":1, "gps":1}
+	run = runs.find_one({"date":{"$gte":s, "$lt":e}}, returndic)
+	run['date'] = run['date'].strftime("%Y-%m-%d")
+	return run
 
 # ------------------------------------------------------------------------
 def dropall():
@@ -125,7 +124,8 @@ def dropall():
 
 # ------------------------------------------------------------------------
 def count():
-	return runs.count()		
+	return runs.count()
+
 
 # Create app
 # ------------------------------------------------------------------------
@@ -142,17 +142,19 @@ def index():
 @app.route('/runs/')
 def show_runs():
 	s = statsAll()
-	return render_template('runs.html', data=s)
+	js = json.dumps(s)
+	return render_template('runs.html', data=js)
 
 @app.route('/runs/<date>')
 def show_run(date):
-	data = runsForDate(datetime.datetime.strptime(date, "%Y-%m-%d"))
-	return render_template('run.html', data=data)
+	data = runForDate(datetime.datetime.strptime(date, "%Y-%m-%d"))
+	js = json.dumps(data)
+	return render_template('run.html', data=js)
 
-@app.route('/sync')
-def sync_runs():
+@app.route('/sync/<int:fetch_max>')
+def sync_runs(fetch_max):
 	c = count()
-	sync()
+	sync(fetch_max)
 	return "Had " + str(c) + " runs. Now got " + str(count())
 
 @app.route('/runs/process')

@@ -1,26 +1,19 @@
-
 //-------------------------------------------------------------------
-// Setup
+// Create bar chart from json data
 //-------------------------------------------------------------------
-parseFormat = d3.time.format.utc("%Y-%m-%dT%H:%M:%S")
-var parseDate = parseFormat.parse;
-
-outFormat = d3.time.format("%y/%m/%d")
-
-//-------------------------------------------------------------------
-// Create bar chart with loaded json data
-//-------------------------------------------------------------------
-d3.json("data/stats.json", function(error, data) {
-	if (error) return console.warn(error);
-	data.forEach(function(d){ d.date = parseDate(d.date); });
-	datebars('#datebars', data, 'date', 'distance');
-	}
-)
+barsFromJson = function(elem, data) {
+	var dateFormat = d3.time.format.utc("%Y-%m-%d");
+	data.forEach(function(d){ d.date = dateFormat.parse(d.date); console.warn(d.date);});
+	datebars(elem, data, 'date', 'distance');
+}
 
 //-------------------------------------------------------------------
 // Bar chart for date indexed data
 //-------------------------------------------------------------------
 datebars = function(id, dat, xlab, ylab) {
+
+	// Setup
+	var outFormat = d3.time.format("%Y-%m-%d");
 	var margin = {top: 10, right: 40, bottom: 100, left: 40};
 	var margin2 = {top: 430, right: 40, bottom: 20, left: 40}
 	var width = 700 - margin.left - margin.right;
@@ -102,10 +95,13 @@ datebars = function(id, dat, xlab, ylab) {
 		.enter().append("rect")
 		.on('mouseover', tip.show)
 		.on('mouseout', tip.hide)
-		.on('click', clicked)
+		//.on('click', clicked)
+		.on('click', function(d) { location.href=outFormat(d.date);})
 		.attr("clip-path", "url(#clip)");
 
 	var N = d3.time.days(domain[0], domain[1]).length;
+	//var N = (domain[0] - domain[1]) / 86400000; // 24*60*60*10000
+	console.warn(N);
 	var w = (width / N) - 2;
 	if(w < 2) w = 2;
 	bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
@@ -194,6 +190,8 @@ datebars = function(id, dat, xlab, ylab) {
 
 		info = "" + outFormat(dat[i][xlab]) + ". " + ylab + " = " + Math.round(100*dat[i][ylab])/100;
 		monitor.text(info);
+
+
 	}
 
 	// Brushing
