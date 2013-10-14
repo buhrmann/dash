@@ -1,10 +1,18 @@
 //-------------------------------------------------------------------
 // Create bar chart from json data
 //-------------------------------------------------------------------
+
+var runs;
+var byDate;
+
 barsFromJson = function(elem, data) {
 	var dateFormat = d3.time.format.utc("%Y-%m-%d");
-	data.forEach(function(d){ d.date = dateFormat.parse(d.date); console.warn(d.date);});
-	datebars(elem, data, 'date', 'distance');
+	data.forEach(function(d){ d.date = dateFormat.parse(d.date); });
+
+	runs = crossfilter(data);
+	byDate = runs.dimension(function(d) { return d.date; });
+
+	datebars(elem, data, 'date', 'distance');	
 }
 
 //-------------------------------------------------------------------
@@ -21,6 +29,7 @@ datebars = function(id, dat, xlab, ylab) {
 	var height2 = 500 - margin2.top - margin2.bottom;
 
 	renderLabels = 0;
+	include0 = false;
 
 	// Create scales and axis
 	var domain = d3.extent(dat, function(d) { return d[xlab]; });
@@ -31,9 +40,11 @@ datebars = function(id, dat, xlab, ylab) {
 
 	var x = d3.time.scale().domain(domain).nice().rangeRound([0, width]); 
 
-	var y = d3.scale.linear()
-			.domain([0, d3.max(dat, function(d) { return d[ylab]; })])
-			.nice().range([height, 0]);
+	if (include0)
+		var ydomain = [0, d3.max(dat, function(d) { return d[ylab]; })];
+	else
+		var ydomain = d3.extent(dat, function(d) { return d[ylab]; });
+	var y = d3.scale.linear().domain(ydomain).nice().range([height, 0]);
 
 	// Create axes
 	var xAxis = d3.svg.axis()
@@ -91,7 +102,7 @@ datebars = function(id, dat, xlab, ylab) {
 
 	// Create marks
 	var bars = focus.selectAll(".bar")
-		.data(dat)
+		.data(dat, function(d) {return d[xlab]; })
 		.enter().append("rect")
 		.on('mouseover', tip.show)
 		.on('mouseout', tip.hide)
@@ -100,8 +111,6 @@ datebars = function(id, dat, xlab, ylab) {
 		.attr("clip-path", "url(#clip)");
 
 	var N = d3.time.days(domain[0], domain[1]).length;
-	//var N = (domain[0] - domain[1]) / 86400000; // 24*60*60*10000
-	console.warn(N);
 	var w = (width / N) - 2;
 	if(w < 2) w = 2;
 	bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
@@ -114,16 +123,16 @@ datebars = function(id, dat, xlab, ylab) {
 	var context = 1;
 	if (context){
 		var x2 = d3.time.scale().domain(domain).nice().rangeRound([0, width]); 
-		var y2 = d3.scale.linear()
-			.domain(y.domain())
-			.nice().range([height2, 0]);
+		var y2 = d3.scale.linear().domain(y.domain()).nice().range([height2, 0]);
 
-		var xAxis2 = d3.svg.axis().scale(x2).orient("bottom")
-				.tickFormat(d3.time.format("%d %b"));
+		var xAxis2 = d3.svg.axis().scale(x2).orient("bottom").tickFormat(d3.time.format("%d %b"));
 
-		var brush = d3.svg.brush()
-			.x(x2)
-			.on("brush", brushed);    
+		var brush = d3.svg.brush().x(x2).on("brush", brushed);    
+
+		initialBrushExtent = 3; // months
+		brushlast = x.domain()[1];
+		brushfirst = d3.time.month.offset(brushlast, -initialBrushExtent);
+		brush.extent([brushfirst, brushlast]);
 
 		var context = svg.append("g")
 			.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
@@ -146,9 +155,20 @@ datebars = function(id, dat, xlab, ylab) {
 
 		bars2.attr("x", function(d) { return x2(d[xlab]) - w/2; })
 			.attr("y", function(d) { return y2(d[ylab]); })
-			.attr("height", function(d) { return height2 - y2(d[ylab]); })
+			.attr("height", function(d) { return height2 -  y2(d[ylab]); })
 			.attr("width", w)
 			.attr("class", "bar");	    
+
+		// Container for brushed statistics
+		var tabCont = "#detail .textdata";
+		var table = d3.select(tabCont).append("table");
+		table.attr("class", "table");
+		var thead = table.append("thead");	
+		var tbody = table.append("tbody");
+		thead.append("tr");			
+
+		// First update with initial extent
+		brushed();
 	}
 
 
@@ -190,35 +210,104 @@ datebars = function(id, dat, xlab, ylab) {
 
 		info = "" + outFormat(dat[i][xlab]) + ". " + ylab + " = " + Math.round(100*dat[i][ylab])/100;
 		monitor.text(info);
+	}
 
-
+	// Statistics
+	function meanMax(label, varname){
+		var mu = d3.mean(byDate.top(Infinity), function(d) { return d[varname]; }).toFixed(2);
+		var max = d3.max(byDate.top(Infinity), function(d) { return d[varname]; }).toFixed(2);
+		return [label,mu,max];
 	}
 
 	// Brushing
 	function brushed() {
+		byDate.filterRange(brush.extent());
+		interval = byDate.top(Infinity);
+
 		x.domain(brush.empty() ? x2.domain() : brush.extent());
 
-		var N = 1 + d3.time.days(x.domain()[0], x.domain()[1]).length;
-		var w = (width / N) - 2;
-		focus.selectAll(".bar").data(dat)
-			.attr("x", function(d) { return x(d[xlab]) - w/2; })
-			.attr("width", w);
+		if (include0)
+			ydomain = [0, d3.max(interval, function(d) { return d[ylab]; })];
+		else
+			ydomain = d3.extent(interval, function(d) { return d[ylab]; });
+		y.domain(ydomain);
 
-		bars = focus.selectAll(".bar").data(dat);
 
-		bars.enter().append("rect")
-			.on('mouseover', tip.show)
-			.on('mouseout', tip.hide)
-			.attr("x", function(d) { return x(d[xlab]) - w/2; })
-			.attr("y", function(d) { return y(d[ylab]); })
-			.attr("height", function(d) { return height - y(d[ylab]); })
-			.attr("width", w)
-			.attr("class", "bar");			
+		var N = d3.time.days(x.domain()[0], x.domain()[1]).length;
+		if (N > 0){
+			var w = (width / N) - 2;
+			bars = focus.selectAll(".bar").data(interval, function(d) {return d[xlab]; });
 
-		bars.exit().remove();
+			bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
+				.attr("width", w);
+
+			bars.transition().duration(200)
+				.attr("height", function(d) { return height - y(d[ylab]); })
+				.attr("y", function(d) { return y(d[ylab]); })
+
+			bars.enter().append("rect")
+				.on('mouseover', tip.show)
+				.on('mouseout', tip.hide)
+				.attr("x", function(d) { return x(d[xlab]) - w/2; })
+				.attr("y", function(d) { return y(d[ylab]); })
+				.attr("height", function(d) { return height - y(d[ylab]); })
+				.attr("width", w)
+				.attr("class", "bar");			
+
+			bars.exit().remove();
+		}
 
 		focus.select(".x.axis").call(xAxis);
-	}
+		focus.select(".y.axis").call(yAxis);
+		
+		// Create statistics
+		var dateFormat = d3.time.format("%H:%M:%S");
+		duration = meanMax("Duration", 'duration');
+		duration[1] = dateFormat(new Date(duration[1]*1000));
+		duration[2] = dateFormat(new Date(duration[2]*1000));
+		var tab = [
+			meanMax("Distance (km)",'distance'),
+			meanMax("Avg Speed (km/h)", 'avgspeed'),
+			meanMax("Max Speed (km/h)", 'maxspeed'),
+			duration
+			];
+		var colnms = ["", "Mean", "Max"];
+		tabulate(tab, colnms, tabCont);
+	} // brushed()
+}
+
+//-------------------------------------------------------------------
+// Drop a data table to a html table
+//-------------------------------------------------------------------
+function tabulate(tab, colnms, id){
+	var table = d3.select(id).select("table");
+	var thead = table.select("thead");
+	var tbody = table.select("tbody");
+
+    // append the header row
+    thead.select("tr").selectAll("th")
+        .data(colnms)
+        .enter()
+        .append("th")
+        .text(function(column) { return column; });
+
+    // create a row for each object in the data
+    var rows = tbody.selectAll("tr")
+        .data(tab);
+
+    rows.enter()
+        .append("tr");
+
+	 // create a cell in each row for each column
+    var cells = rows.selectAll("td")
+        .data(function(d) { return d;}) // Bind the ith row
+        .text(function(d) { return d; });
+
+   	cells.enter()
+        .append("td")
+        .text(function(d) { return d; });
+    
+    return table;        
 }
 
 

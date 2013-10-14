@@ -15,7 +15,7 @@ duallines = function(id, dat, xlab, y1lab, y2lab) {
 	var margin = {top: 10, right: 40, bottom: 40, left: 40};
 	var width = 700 - margin.left - margin.right;
 	var height = 300 - margin.top - margin.bottom;
-
+	yscalar = 1.0
 
 	y2lab = typeof(y2lab) !== 'undefined' ? y2lab : null;
 
@@ -70,7 +70,6 @@ duallines = function(id, dat, xlab, y1lab, y2lab) {
 
 	// Create second axis and line if desired
 	if (y2lab != null) {
-		yscalar = 1
 		var y2min = y2inc0 ? 0 : d3.min(dat, function(d) { return d[y2lab]; });
 		var y2 = d3.scale.linear()
 			.domain([y2min, d3.max(dat, function(d) { return d[y2lab]; }) ])

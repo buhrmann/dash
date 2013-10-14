@@ -1,15 +1,18 @@
 {% extends "layout.html" %}
 {% block head %}
 	{{ super() }}
-	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.js')}}></script>
-	<script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script>	
 	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
 {% endblock %}
 {% block content %}
   {% if data %}
-    <div id="duallines"><h3>Speed and elevation</h3></div>
+    <div id="duallines">
+    	<h3>Run detail</h3>
+    	<p>Speed in km/h and elevation in m as a function of distance.</p>
+    </div>
   {% endif %}
 {% endblock %}
 {% block js_footer %}
+	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script>	
 	<script type="text/javascript">dualFromJson("#duallines", {{data|safe}});</script>
 {% endblock %}
