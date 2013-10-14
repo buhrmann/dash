@@ -1,6 +1,6 @@
 import os
 from urlparse import urlparse
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash, url_for, session, redirect
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from sets import Set
@@ -151,11 +151,20 @@ def show_run(date):
 	js = json.dumps(data)
 	return render_template('run.html', data=js)
 
+#@app.route('/sync/<int:fetch_max>')
+@app.route('/sync_ajax')
+def sync_runs_ajax():
+	fetch_max = request.args.get('maxruns', 0, type=int)
+	c = count()
+	sync(fetch_max)
+	return "Had " + str(c) + " runs. Now got " + str(count())
+
 @app.route('/sync/<int:fetch_max>')
 def sync_runs(fetch_max):
 	c = count()
 	sync(fetch_max)
-	return "Had " + str(c) + " runs. Now got " + str(count())
+	flash("Had " + str(c) + " runs. Now got " + str(count()) )
+	return redirect(url_for('show_runs'))
 
 @app.route('/runs/process')
 def process_runs():
@@ -170,11 +179,11 @@ def drop_runs():
 	dropall()
 	return "Dropped all " + c + " runs!"
 
-# Views
-# ------------------------------------------------------------------------
 @app.errorhandler(404)
 def page_not_found(e):
 	return render_template('404.html'), 404
+
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 # Autostart
 # ------------------------------------------------------------------------

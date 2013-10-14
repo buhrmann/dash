@@ -29,7 +29,7 @@ datebars = function(id, dat, xlab, ylab) {
 	var height2 = 500 - margin2.top - margin2.bottom;
 
 	renderLabels = 0;
-	include0 = false;
+	include0 = true;
 
 	// Create scales and axis
 	var domain = d3.extent(dat, function(d) { return d[xlab]; });
@@ -95,7 +95,7 @@ datebars = function(id, dat, xlab, ylab) {
 	  .attr('class', 'd3-tip')
 	  .offset([-10, 0])
 	  .html(function(d) {
-		return "<strong>Distance:</strong> <span style='color:red'>" + Math.round(100*d[ylab])/100 + "</span>";
+		return "<span>" + Math.round(100*d[ylab])/100 + "</span> km";
 		});
 
 	focus.call(tip);	    
@@ -213,30 +213,35 @@ datebars = function(id, dat, xlab, ylab) {
 	}
 
 	// Statistics
-	function meanMax(label, varname){
-		var mu = d3.mean(byDate.top(Infinity), function(d) { return d[varname]; }).toFixed(2);
-		var max = d3.max(byDate.top(Infinity), function(d) { return d[varname]; }).toFixed(2);
+	function meanMax(data, label, varname){
+		var mu = d3.mean(data, function(d) { return d[varname]; }).toFixed(2);
+		var max = d3.max(data, function(d) { return d[varname]; }).toFixed(2);
 		return [label,mu,max];
 	}
 
 	// Brushing
 	function brushed() {
 		byDate.filterRange(brush.extent());
+		
 		interval = byDate.top(Infinity);
+		d3.select("#numruns").text(interval.length);
 
-		x.domain(brush.empty() ? x2.domain() : brush.extent());
+		xdomain = brush.empty() ? x2.domain() : brush.extent();
+		xdomain[0] = d3.time.day.offset(xdomain[0], -1);
+		xdomain[1] = d3.time.day.offset(xdomain[1], 1);
+		x.domain(xdomain);
 
 		if (include0)
 			ydomain = [0, d3.max(interval, function(d) { return d[ylab]; })];
 		else
 			ydomain = d3.extent(interval, function(d) { return d[ylab]; });
-		y.domain(ydomain);
+		y.domain(ydomain).nice();
 
 
-		var N = d3.time.days(x.domain()[0], x.domain()[1]).length;
-		if (N > 0){
+		var N = d3.time.days(xdomain[0], xdomain[1]).length + 1;
+		if (N > 0){			
 			var w = (width / N) - 2;
-			bars = focus.selectAll(".bar").data(interval, function(d) {return d[xlab]; });
+			bars = focus.selectAll(".bar").data(dat, function(d) {return d[xlab]; });
 
 			bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
 				.attr("width", w);
@@ -261,18 +266,20 @@ datebars = function(id, dat, xlab, ylab) {
 		focus.select(".y.axis").call(yAxis);
 		
 		// Create statistics
-		var dateFormat = d3.time.format("%H:%M:%S");
-		duration = meanMax("Duration", 'duration');
-		duration[1] = dateFormat(new Date(duration[1]*1000));
-		duration[2] = dateFormat(new Date(duration[2]*1000));
-		var tab = [
-			meanMax("Distance (km)",'distance'),
-			meanMax("Avg Speed (km/h)", 'avgspeed'),
-			meanMax("Max Speed (km/h)", 'maxspeed'),
-			duration
-			];
-		var colnms = ["", "Mean", "Max"];
-		tabulate(tab, colnms, tabCont);
+		if(interval.length > 0){
+			var dateFormat = d3.time.format.utc("%H:%M:%S");
+			duration = meanMax(interval, "Duration", 'duration');
+			duration[1] = dateFormat(new Date(duration[1]*1000));
+			duration[2] = dateFormat(new Date(duration[2]*1000));
+			var tab = [
+				meanMax(interval, "Distance (km)",'distance'),
+				duration,
+				meanMax(interval, "Avg Speed (km/h)", 'avgspeed'),
+				meanMax(interval, "Max Speed (km/h)", 'maxspeed'),
+				];
+			var colnms = ["", "Mean", "Max"];
+			tabulate(tab, colnms, tabCont);
+		}
 	} // brushed()
 }
 
@@ -306,8 +313,6 @@ function tabulate(tab, colnms, id){
    	cells.enter()
         .append("td")
         .text(function(d) { return d; });
-    
-    return table;        
 }
 
 

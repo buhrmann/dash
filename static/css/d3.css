@@ -4,14 +4,6 @@
   shape-rendering: crispEdges;
 }
 
-div.bar {
-    display: inline-block;
-    width: 20px;
-    height: 75px;   /* We'll override this later */
-    background-color: teal;
-    margin-right: 2px;
-}
-
 svg .axis path, 
 svg .axis line {
 	fill: none;
@@ -33,10 +25,13 @@ svg .axis text {
 
 svg .bar {
     fill: #3C75A3;    
+    shape-rendering: crispEdges; 
+    <!--
     -moz-transition: all 0.1s;
     -o-transition: all 0.1s;
     -webkit-transition: all 0.1s;
-    transition: all 0.1s;    
+    transition: all 0.1s;   
+    -->
 }
 
 svg .bar:hover {
@@ -63,13 +58,13 @@ svg .trackpad {
 }
 
 .tip {
-    fill: rgba(255,255,255,0.8);
+    fill: rgba(0,0,0,0.8);
     font-family: sans-serif;
     font-size: 10px;    
 }
 
 svg text.tip{    
-    stroke: black;
+    stroke: white;
 }
 
 .d3-tip {
@@ -77,8 +72,8 @@ svg text.tip{
   font: 10px sans-serif;
   font-weight: bold;
   padding: 8px;
-  background: rgba(200, 200, 200, 0.8);
-  color: #000;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
   border-radius: 2px;
 }
 
@@ -89,7 +84,7 @@ svg text.tip{
   font-size: 10px;
   width: 100%;
   line-height: 1;
-  color: rgba(200, 200, 200, 0.8);
+  color: rgba(0, 0, 0, 0.8);
   content: "\25BC";
   position: absolute;
   text-align: center;
