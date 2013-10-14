@@ -11,7 +11,7 @@
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}">
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
-      <link rel="shortcut icon" href="{{ url_for('static', filename='iamges/favicon.ico') }}">
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
       <script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}; </script>
       <!--
       <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -47,15 +47,21 @@
               </ul>
             </li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
+          {% if not session.logged_in %}
+            <form class="navbar-form navbar-right" action="{{ url_for('login') }}" method=post>
+              <div class="form-group">
+                <input type="text" name=username placeholder="User" class="form-control">
+              </div>
+              <div class="form-group">
+                <input type="password" name=password placeholder="Password" class="form-control">              
+              </div>            
+              <button type="submit" value=Login class="btn btn-success">Sign in</button>
+            </form>
+          {% else %}
+            <form class="navbar-form navbar-right" action="{{ url_for('logout') }}" method=get>
+              <button type="submit" value=Login class="btn btn-default">Sign out</button>
+            </form>
+          {% endif %}
         </div><!-- .navbar-collapse -->
       </div><!-- .container -->
     </div><!-- .navbar -->
@@ -65,8 +71,19 @@
       <div class="hero-unit">
         <h1>Dash: nike+ data visualization</h1>
         <p>Build with Flask, MongoDB, Jinja templates and Bootstrap css.</p>
+        {% if session.logged_in %}
+        <form action="{{ url_for('sync_runs') }}" method=post class="form-inline" role="form">
+            <span class="help-block">Fetch last n runs from nike's servers now!</span>
+            <div class="form-group">
+              <label for="fetchMax" class="sr-only">Max sync runs:</label>
+              <input type=number name=maxruns id="fetchMax" placeholder="10" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-default">Sync</button>
+        </form>
+        {% endif %}
       </div> <!-- .hero-unit -->
 
+      <div class="messages" style="margin-top:10px">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for c,m in messages %}
@@ -74,6 +91,7 @@
             {% endfor %}
         {% endif %}
       {% endwith %}
+      </div>
 
       <div class="row">
         <div class="col-lg-8">

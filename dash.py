@@ -10,7 +10,17 @@ import datetime
 import nike
 import stats
 
-coll_name = "runs"	
+# Configuration
+COLL_NAME = "runs"	
+DEBUG = True
+SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+USER_NAME = 'syngnz'
+PASSWORD = 'inform'
+
+# Create app
+# ------------------------------------------------------------------------
+app = Flask(__name__)
+app.config.from_object(__name__)
 
 # Connect to DB 
 # ------------------------------------------------------------------------
@@ -31,14 +41,13 @@ def connect():
 # ------------------------------------------------------------------------
 def runs():
 	db = connect()
-	if(coll_name in db.collection_names()):
+	if(COLL_NAME in db.collection_names()):
 		print "Retrieving runs collection"
-		return db[coll_name]
+		return db[COLL_NAME]
 	else:
 		print "Creating runs collection"
-		db.create_collection(coll_name)
-		return db[coll_name]
-
+		db.create_collection(COLL_NAME)
+		return db[COLL_NAME]
 
 runs = runs()		
 
@@ -127,16 +136,12 @@ def count():
 	return runs.count()
 
 
-# Create app
-# ------------------------------------------------------------------------
-app = Flask(__name__)
-
 # ------------------------------------------------------------------------
 # Views
 # ------------------------------------------------------------------------
 @app.route('/')
 def index():
-	return render_template('page.html')
+	return redirect(url_for('show_runs'))
 
 @app.route('/runs')
 @app.route('/runs/')
@@ -151,19 +156,14 @@ def show_run(date):
 	js = json.dumps(data)
 	return render_template('run.html', data=js)
 
-#@app.route('/sync/<int:fetch_max>')
-@app.route('/sync_ajax')
-def sync_runs_ajax():
+@app.route('/sync', methods=['POST'])
+def sync_runs():
+	if not session.get('logged_in'):
+		abort(401)
 	fetch_max = request.args.get('maxruns', 0, type=int)
 	c = count()
 	sync(fetch_max)
-	return "Had " + str(c) + " runs. Now got " + str(count())
-
-@app.route('/sync/<int:fetch_max>')
-def sync_runs(fetch_max):
-	c = count()
-	sync(fetch_max)
-	flash("Had " + str(c) + " runs. Now got " + str(count()), "info")
+	flash("Added " + str(count() - c) + " new runs.")
 	return redirect(url_for('show_runs'))
 
 @app.route('/runs/process')
@@ -179,6 +179,29 @@ def drop_runs():
 	dropall()
 	return "Dropped all " + c + " runs!"
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USER_NAME']:
+            error = 'Invalid username'
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Invalid password'
+        else:
+            session['logged_in'] = True
+            flash('You were logged in')
+            return redirect(url_for('show_runs'))
+
+    flash(error)
+    return redirect(url_for('show_runs'))
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('You were logged out')
+    return redirect(url_for('show_runs'))
+
+
 @app.errorhandler(404)
 def page_not_found(e):
 	return render_template('404.html'), 404
@@ -188,10 +211,9 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')	
 
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 # Autostart
 # ------------------------------------------------------------------------
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run()
 

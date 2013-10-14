@@ -224,7 +224,9 @@ datebars = function(id, dat, xlab, ylab) {
 		byDate.filterRange(brush.extent());
 		
 		interval = byDate.top(Infinity);
+		//console.warn(typeof(interval[0]['distance']));
 		d3.select("#numruns").text(interval.length);
+		d3.select("#totalkm").text(d3.sum(interval, function(d) {return d.distance;}).toFixed(2) );
 
 		xdomain = brush.empty() ? x2.domain() : brush.extent();
 		xdomain[0] = d3.time.day.offset(xdomain[0], -1);
