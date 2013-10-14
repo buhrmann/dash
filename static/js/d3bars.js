@@ -241,6 +241,7 @@ datebars = function(id, dat, xlab, ylab) {
 		var N = d3.time.days(xdomain[0], xdomain[1]).length + 1;
 		if (N > 0){			
 			var w = (width / N) - 2;
+			if(w < 2) w = 2;
 			bars = focus.selectAll(".bar").data(dat, function(d) {return d[xlab]; });
 
 			bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
