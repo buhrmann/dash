@@ -163,14 +163,14 @@ def sync_runs_ajax():
 def sync_runs(fetch_max):
 	c = count()
 	sync(fetch_max)
-	flash("Had " + str(c) + " runs. Now got " + str(count()) )
+	flash("Had " + str(c) + " runs. Now got " + str(count()), "info")
 	return redirect(url_for('show_runs'))
 
 @app.route('/runs/process')
 def process_runs():
 	c = count()
 	processAll(True)
-	return "Had " + str(c) + " runs. Now got " + str(count())
+	return "Added " + str(count() - c) + " new runs."
 
 
 @app.route('/runs/drop')
