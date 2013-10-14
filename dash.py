@@ -160,7 +160,8 @@ def show_run(date):
 def sync_runs():
 	if not session.get('logged_in'):
 		abort(401)
-	fetch_max = request.args.get('maxruns', 0, type=int)
+	#fetch_max = request.args.get('maxruns', 0, type=int)
+	fetch_max = int(request.form['maxruns'])
 	c = count()
 	sync(fetch_max)
 	flash("Added " + str(count() - c) + " new runs.")

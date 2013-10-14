@@ -29,20 +29,4 @@
 	<script type="text/javascript" src={{url_for('static', filename='js/crossfilter.min.js')}}></script>	
 	<script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
 	<script type="text/javascript">barsFromJson("#datebars", {{data|safe}})</script>
-	<!--
-	<script type=text/javascript>
-	  $(function() {
-	    $('a#sync').bind('click', function() {
-	      $.getJSON($SCRIPT_ROOT + '/sync_ajax', {
-	        max: $('input[name="maxruns"]').val(),
-	      }, function(data) {
-	        $("#result").text(data.result);
-	      });
-	      return false;
-	    });
-	  });
-	</script>
-	<p><input type=text size=5 name=maxruns> : <span id=result>?</span>
-	<p><a href=# id=sync>Sync</a>
-	-->
 {% endblock %}
