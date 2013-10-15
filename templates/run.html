@@ -3,14 +3,27 @@
 	{{ super() }}
 	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
 {% endblock %}
+
 {% block content %}
   {% if data %}
     <div id="duallines">
-    	<h3>Run detail</h3>
+    	<h3>Individual run</h3>
     	<p>Speed in km/h and elevation in m as a function of distance.</p>
     </div>
   {% endif %}
 {% endblock %}
+
+{% block side1 %}
+  {% if data %}
+    <div id="detail">
+    	<h3>Detail</h3>
+    	<p><span id="date"></span></p>
+    	<div class="textdata"></div> 
+    	<a href=""></a>   	
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block js_footer %}
 	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
 	<script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script>	

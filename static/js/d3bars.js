@@ -30,6 +30,8 @@ datebars = function(id, dat, xlab, ylab) {
 
 	renderLabels = 0;
 	include0 = true;
+	var tabCont = "#stats .textdata";
+	var detailCont = "#detail .textdata";
 
 	// Create scales and axis
 	var domain = d3.extent(dat, function(d) { return d[xlab]; });
@@ -54,10 +56,6 @@ datebars = function(id, dat, xlab, ylab) {
 	var yAxis = d3.svg.axis()
 		.scale(y)
 		.orient("left");
-
-	// Create container for textual information
-	var monitor = d3.select(id).append("div")
-		.attr("class", "monitor");
 
 	// Create svg container for chart
 	var svg = d3.select(id).append("svg")
@@ -90,23 +88,11 @@ datebars = function(id, dat, xlab, ylab) {
 		  .style("text-anchor", "end")
 		  .text("Distance");
 
-	// tool-tip
-	var tip = d3.tip()
-	  .attr('class', 'd3-tip')
-	  .offset([-10, 0])
-	  .html(function(d) {
-		return "<span>" + Math.round(100*d[ylab])/100 + "</span> km";
-		});
-
-	focus.call(tip);	    
-
 	// Create marks
 	var bars = focus.selectAll(".bar")
 		.data(dat, function(d) {return d[xlab]; })
 		.enter().append("rect")
-		.on('mouseover', tip.show)
-		.on('mouseout', tip.hide)
-		//.on('click', clicked)
+		.on('mouseover', function(d) { hovered(d); } )
 		.on('click', function(d) { location.href=outFormat(d.date);})
 		.attr("clip-path", "url(#clip)");
 
@@ -160,12 +146,15 @@ datebars = function(id, dat, xlab, ylab) {
 			.attr("class", "bar");	    
 
 		// Container for brushed statistics
-		var tabCont = "#detail .textdata";
-		var table = d3.select(tabCont).append("table");
-		table.attr("class", "table");
-		var thead = table.append("thead");	
-		var tbody = table.append("tbody");
+		var statsTable = d3.select(tabCont).append("table");
+		statsTable.attr("class", "table");
+		var thead = statsTable.append("thead");	
+		var tbody = statsTable.append("tbody");
 		thead.append("tr");			
+
+		var detailTable = d3.select(detailCont).append("table");
+		detailTable.attr("class", "table");
+		detailTable.append("tbody");
 
 		// First update with initial extent
 		brushed();
@@ -198,19 +187,26 @@ datebars = function(id, dat, xlab, ylab) {
 
 	
 	// Extract info for clicked bar
-	function clicked() {
-		var bisectx = d3.bisector(function(d) { return d[xlab]; }).left;
-		var mx = d3.mouse(this)[0];
-		var vx = x.invert(mx);
-		var ix = bisectx(dat, vx, 1);
-		var d0 = Math.abs(vx - dat[ix-1][xlab]);
-		var d1 = Math.abs(vx - dat[ix][xlab]);
-		var d2 = Math.abs(vx - dat[ix+1][xlab]);
-		var i = d0 < d1 ? (d0 < d2 ? ix-1 : ix+1) : (d1 < d2 ? ix : ix+1);
+	function hovered(row) {
 
-		info = "" + outFormat(dat[i][xlab]) + ". " + ylab + " = " + Math.round(100*dat[i][ylab])/100;
-		monitor.text(info);
+		lnk = "View in more detail."
+		d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
+
+		var dateStr = outFormat(row[xlab]);
+		var timeFormat = d3.time.format.utc("%H:%M:%S");
+		var time = timeFormat(new Date(row['duration']*1000));
+		var tab = [
+			["Date", dateStr],
+			["Distance (km)", row['distance'].toFixed(2)],
+			["Duration", time],
+			["Avg Speed (km/h)", row['avgspeed'].toFixed(2)],
+			["Max Speed (km/h)", row['maxspeed'].toFixed(2)]
+			];
+		var colnms = null;
+		tabulate(tab, colnms, detailCont);
 	}
+
+	hovered(dat[dat.length - 1]);
 
 	// Statistics
 	function meanMax(data, label, varname){
@@ -254,8 +250,6 @@ datebars = function(id, dat, xlab, ylab) {
 				.attr("y", function(d) { return y(d[ylab]); })
 
 			bars.enter().append("rect")
-				.on('mouseover', tip.show)
-				.on('mouseout', tip.hide)
 				.attr("x", function(d) { return x(d[xlab]) - w/2; })
 				.attr("y", function(d) { return y(d[ylab]); })
 				.attr("height", function(d) { return height - y(d[ylab]); })
@@ -291,17 +285,19 @@ datebars = function(id, dat, xlab, ylab) {
 //-------------------------------------------------------------------
 function tabulate(tab, colnms, id){
 	var table = d3.select(id).select("table");
-	var thead = table.select("thead");
-	var tbody = table.select("tbody");
 
     // append the header row
-    thead.select("tr").selectAll("th")
-        .data(colnms)
-        .enter()
-        .append("th")
-        .text(function(column) { return column; });
+    if(colnms != null){
+	    var thead = table.select("thead");
+	    thead.select("tr").selectAll("th")
+	        .data(colnms)
+	        .enter()
+	        .append("th")
+	        .text(function(column) { return column; });
+    }
 
     // create a row for each object in the data
+    var tbody = table.select("tbody");
     var rows = tbody.selectAll("tr")
         .data(tab);
 
