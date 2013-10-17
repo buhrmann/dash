@@ -7,7 +7,7 @@
 {% block content %}
   {% if data %}
     <div id="datebars">
-    	<h3>Overview</h3>
+    	<h3>All my runs</h3>
     	<p> Distance of all runs in km arranged by date. Use the brush to focus on a specific range of runs and view the corresponding statistics on the right. Click on any bar to view the selected run in more detail. </p>
     </div>
   {% endif %}
@@ -16,7 +16,7 @@
 {% block side1 %}
   {% if data %}
     <div id="stats">
-    	<h3>Statistics</h3>
+    	<h3>Statistics for range</h3>
     	<p>Basic stastistics for <b><span id="numruns">-</span></b> selected runs, with a total of <b><span id="totalkm">-</span></b> km.</p>
     	<div class="textdata"></div>
     </div>
@@ -26,7 +26,7 @@
 {% block side2 %}
   {% if data %}
     <div id="detail">
-    	<h3>Detail</h3>
+    	<h3>Selected run</h3>
     	<p>Numerical detail for selected run.</p>
     	<div class="textdata"></div> 
     	<a href=""></a>   	
@@ -34,9 +34,22 @@
   {% endif %}
 {% endblock %}
 
+{% block row2 %}
+  {% if data %}
+    <div id="table">
+    	<h3>List of selected runs</h3>
+    	<p>Numerical detail for range of selected runs.</p>
+    	<div class="textdata"></div> 
+    </div>
+  {% endif %}
+{% endblock %}
+
+
 {% block js_footer %}
 	{{ super() }}
 	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3.tip.min.js')}}></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>	
 	<script type="text/javascript" src={{url_for('static', filename='js/d3bars.js')}}></script>	
 	<script type="text/javascript" src={{url_for('static', filename='js/crossfilter.min.js')}}></script>	
 	<script type="text/javascript">barsFromJson("#datebars", {{data|safe}})</script>

@@ -2,8 +2,19 @@
 // Create bar chart with loaded json data
 //-------------------------------------------------------------------
 dualFromJson = function(id, data) {
+	// Subtract mean from elevation ?
 	//var mu = d3.mean(data, function(d) { return d['elevation']; });
 	//data.forEach(function(d){ d['elevation'] = d['elevation'] - mu; })
+	
+	var dateFormat = d3.time.format.utc("%Y-%m-%d");
+	data['date'] = dateFormat.parse(data['date']);
+
+	// Create table containers for pushing data into
+	var detailTabParent = "#detail .textdata";
+	emptyTable(detailTabParent, false, "detailTable", "table");
+	tabulate(tableForRun(data.stats, data['date']), null, detailTabParent);
+
+	// Draw main chart
 	duallines('#duallines', data.gps, 'cumdist', 'speedsmooth', 'elevation');
 }
 

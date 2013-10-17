@@ -17,7 +17,6 @@
   {% if data %}
     <div id="detail">
     	<h3>Detail</h3>
-    	<p><span id="date"></span></p>
     	<div class="textdata"></div> 
     	<a href=""></a>   	
     </div>
@@ -26,6 +25,7 @@
 
 {% block js_footer %}
 	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>		
 	<script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script>	
 	<script type="text/javascript">dualFromJson("#duallines", {{data|safe}});</script>
 {% endblock %}

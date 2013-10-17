@@ -2,11 +2,14 @@
 // Create bar chart from json data
 //-------------------------------------------------------------------
 
+// Globals
 var runs;
 var byDate;
+var selectedElem = null;
+var dateFormat = d3.time.format.utc("%Y-%m-%d");
 
 barsFromJson = function(elem, data) {
-	var dateFormat = d3.time.format.utc("%Y-%m-%d");
+
 	data.forEach(function(d){ d.date = dateFormat.parse(d.date); });
 
 	runs = crossfilter(data);
@@ -30,16 +33,17 @@ datebars = function(id, dat, xlab, ylab) {
 
 	renderLabels = 0;
 	include0 = true;
-	var tabCont = "#stats .textdata";
-	var detailCont = "#detail .textdata";
+
+	var statsTabParent = "#stats .textdata";
+	var detailTabParent = "#detail .textdata";
+	var listTabParent = "#table .textdata";
 
 	// Create scales and axis
-	var domain = d3.extent(dat, function(d) { return d[xlab]; });
-	// Add one day before and after
+	// Add one day before and after first and last data point
+	var domain = d3.extent(dat, function(d) { return d[xlab]; });	
 	var first = d3.time.day.offset(dat[0][xlab], -1);
 	var last = d3.time.day.offset(dat[dat.length - 1][xlab], 1)
 	domain = [first, last]
-
 	var x = d3.time.scale().domain(domain).nice().rangeRound([0, width]); 
 
 	if (include0)
@@ -88,11 +92,19 @@ datebars = function(id, dat, xlab, ylab) {
 		  .style("text-anchor", "end")
 		  .text("Distance");
 
+	// Create tooltip
+	tip = d3.tip().attr('class', 'd3-tip')
+		.offset([-10, 0])
+		.html(function(d) { return d['distance'].toFixed(2) + " km"; });
+
+	focus.call(tip);		  
+
 	// Create marks
 	var bars = focus.selectAll(".bar")
 		.data(dat, function(d) {return d[xlab]; })
 		.enter().append("rect")
-		.on('mouseover', function(d) { hovered(d); } )
+		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
+		.on('mouseout', tip.hide)
 		.on('click', function(d) { location.href=outFormat(d.date);})
 		.attr("clip-path", "url(#clip)");
 
@@ -145,68 +157,38 @@ datebars = function(id, dat, xlab, ylab) {
 			.attr("width", w)
 			.attr("class", "bar");	    
 
-		// Container for brushed statistics
-		var statsTable = d3.select(tabCont).append("table");
-		statsTable.attr("class", "table");
-		var thead = statsTable.append("thead");	
-		var tbody = statsTable.append("tbody");
-		thead.append("tr");			
-
-		var detailTable = d3.select(detailCont).append("table");
-		detailTable.attr("class", "table");
-		detailTable.append("tbody");
+		// Create table containers for pushing data into
+		emptyTable(statsTabParent, true, "statsTable", "table");
+		emptyTable(detailTabParent, false, "detailTable", "table");
+		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover");
 
 		// First update with initial extent
 		brushed();
 	}
-
-
-	// Create labels
-	if (renderLabels) {
-
-		var labels = svg.selectAll(".text")
-		   .data(dat)
-		   .enter().append("text");
-
-		labels.text(function(d) { return Math.round(d['value'] * 10) / 10; } )
-			.attr("font-family", "sans-serif")
-			.attr("font-size", "10px")
-			.attr("fill", "white")
-			.attr("text-anchor", "middle");
-
-		if (scaleType == "linear"){
-			var w = (width / dat.length) - 2;
-			labels.attr("x", function(d) { return x(d[xlab]); })
-				.attr("y", function(d) { return y(d[ylab]) + 12; })
-		}
-		else if (scaleType == "ordinal"){
-			labels.attr("x", function(d) { return x(d[xlab]) + x.rangeBand()/2; })
-				.attr("y", function(d) { return y(d[ylab]) + 12; })
-		}
-	}
-
 	
 	// Extract info for clicked bar
-	function hovered(row) {
+	function hovered(run, elem) {
 
+		if(elem != selectedElem)
+		{
+			if(selectedElem != null)
+				selectedElem.classed("selected", false);
+
+			elem.classed("selected", true);
+			selectedElem = elem;
+		}
+
+		// Update link to single run view
+		var dateStr = dateFormat(run['date']);
 		lnk = "View in more detail."
 		d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
 
-		var dateStr = outFormat(row[xlab]);
-		var timeFormat = d3.time.format.utc("%H:%M:%S");
-		var time = timeFormat(new Date(row['duration']*1000));
-		var tab = [
-			["Date", dateStr],
-			["Distance (km)", row['distance'].toFixed(2)],
-			["Duration", time],
-			["Avg Speed (km/h)", row['avgspeed'].toFixed(2)],
-			["Max Speed (km/h)", row['maxspeed'].toFixed(2)]
-			];
-		var colnms = null;
-		tabulate(tab, colnms, detailCont);
+		// Update single run tabular widget
+		tabulate(tableForRun(run), null, detailTabParent);
 	}
 
-	hovered(dat[dat.length - 1]);
+	// Select last run initially
+	hovered(dat[dat.length - 1], null);
 
 	// Statistics
 	function meanMax(data, label, varname){
@@ -217,10 +199,10 @@ datebars = function(id, dat, xlab, ylab) {
 
 	// Brushing
 	function brushed() {
-		byDate.filterRange(brush.extent());
-		
+		// Get data in brush range for statistics
+		byDate.filterRange(brush.extent());		
 		interval = byDate.top(Infinity);
-		//console.warn(typeof(interval[0]['distance']));
+
 		d3.select("#numruns").text(interval.length);
 		d3.select("#totalkm").text(d3.sum(interval, function(d) {return d.distance;}).toFixed(2) );
 
@@ -254,7 +236,8 @@ datebars = function(id, dat, xlab, ylab) {
 				.attr("y", function(d) { return y(d[ylab]); })
 				.attr("height", function(d) { return height - y(d[ylab]); })
 				.attr("width", w)
-				.attr("class", "bar");			
+				.attr("class", "bar")
+				.on('mouseover', function(d) { tip.show; hovered(d, d3.select(this)); } );			
 
 			bars.exit().remove();
 		}
@@ -264,10 +247,10 @@ datebars = function(id, dat, xlab, ylab) {
 		
 		// Create statistics
 		if(interval.length > 0){
-			var dateFormat = d3.time.format.utc("%H:%M:%S");
+			var timeFormat = d3.time.format.utc("%H:%M:%S");
 			duration = meanMax(interval, "Duration", 'duration');
-			duration[1] = dateFormat(new Date(duration[1]*1000));
-			duration[2] = dateFormat(new Date(duration[2]*1000));
+			duration[1] = timeFormat(new Date(duration[1]*1000));
+			duration[2] = timeFormat(new Date(duration[2]*1000));
 			var tab = [
 				meanMax(interval, "Distance (km)",'distance'),
 				duration,
@@ -275,45 +258,20 @@ datebars = function(id, dat, xlab, ylab) {
 				meanMax(interval, "Max Speed (km/h)", 'maxspeed'),
 				];
 			var colnms = ["", "Mean", "Max"];
-			tabulate(tab, colnms, tabCont);
+			tabulate(tab, colnms, statsTabParent);
+
+			// Create list table
+			l = [];
+			head = varNamesForRun();
+			for (i=0; i<interval.length; i++){
+				l.push(listForRun(interval[i]));
+			}
+			var listTab = tabulate(l, head, listTabParent);
+			listTab.selectAll("tbody tr") 
+        		.sort(function(a, b) { return d3.descending(a[1], b[1]); });
 		}
 	} // brushed()
 }
-
-//-------------------------------------------------------------------
-// Drop a data table to a html table
-//-------------------------------------------------------------------
-function tabulate(tab, colnms, id){
-	var table = d3.select(id).select("table");
-
-    // append the header row
-    if(colnms != null){
-	    var thead = table.select("thead");
-	    thead.select("tr").selectAll("th")
-	        .data(colnms)
-	        .enter()
-	        .append("th")
-	        .text(function(column) { return column; });
-    }
-
-    // create a row for each object in the data
-    var tbody = table.select("tbody");
-    var rows = tbody.selectAll("tr")
-        .data(tab);
-
-    rows.enter()
-        .append("tr");
-
-	 // create a cell in each row for each column
-    var cells = rows.selectAll("td")
-        .data(function(d) { return d;}) // Bind the ith row
-        .text(function(d) { return d; });
-
-   	cells.enter()
-        .append("td")
-        .text(function(d) { return d; });
-}
-
 
 
 //-------------------------------------------------------------------
