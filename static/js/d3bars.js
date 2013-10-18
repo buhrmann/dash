@@ -259,6 +259,12 @@ datebars = function(id, dat, xlab, ylab) {
 			//tabulate(stats, runMapper, runMapper.statsorder, statsTabParent);
 
 			var listTab = tabulate(interval, runMapper, runMapper.order, listTabParent);
+			// Add linking behaviour
+			dateIdx = runMapper.order.indexOf("date");
+	    	listTab.selectAll("tr")
+	    		.on('click', function(d) { location.href=d[dateIdx];})
+	    		.on('mouseover', function(d) { d3.select(this).style("cursor", "pointer"); } );
+
 			//listTab.selectAll("tbody tr") 
         	//	.sort(function(a, b) { return d3.descending(a[1], b[1]); });
 		}

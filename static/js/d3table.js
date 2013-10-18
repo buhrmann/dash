@@ -8,7 +8,7 @@ runMapper.duration = {"label" : "Duration", "mapper" : function(x) { return time
 runMapper.avgspeed = {"label" : "Avg Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.maxspeed = {"label" : "Max Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.date = {"label" : "Date", "mapper" : function(x) { return dateFormat(x);} };
-runMapper.order = ["date","distance", "duration", "avgspeed"];
+runMapper.order = ["date", "distance", "duration", "avgspeed"];
 runMapper.statsorder = ["label", "distance", "duration", "avgspeed", "maxspeed"];
 
 //-------------------------------------------------------------------
@@ -104,7 +104,7 @@ function tabulate(data, mapper, vars, parent, transposed, hasLabels){
         //.data(data);
         .data(matrix);
 
-    rows.enter().append("tr");
+    rows.enter().append("tr");    
     rows.exit().remove();
 
 	 // Update cell by binding data in each row for each column
