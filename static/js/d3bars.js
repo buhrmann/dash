@@ -159,7 +159,7 @@ datebars = function(id, dat, xlab, ylab) {
 
 		// Create table containers for pushing data into
 		emptyTable(statsTabParent, true, "statsTable", "table");
-		emptyTable(detailTabParent, false, "detailTable", "table");
+		emptyTable(detailTabParent, true, "detailTable", "table");
 		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover");
 
 		// First update with initial extent
@@ -184,17 +184,19 @@ datebars = function(id, dat, xlab, ylab) {
 		d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
 
 		// Update single run tabular widget
-		tabulate(tableForRun(run), null, detailTabParent);
+		tabulate([run], runMapper, runMapper.order, detailTabParent, true, false);
 	}
 
 	// Select last run initially
 	hovered(dat[dat.length - 1], null);
 
-	// Statistics
-	function meanMax(data, label, varname){
-		var mu = d3.mean(data, function(d) { return d[varname]; }).toFixed(2);
-		var max = d3.max(data, function(d) { return d[varname]; }).toFixed(2);
-		return [label,mu,max];
+	// Statistics helper
+	function statistic(data, stat, vars){
+		o = {};
+		for (var i=0; i < vars.length; i++){
+			o[vars[i]] = stat(data, function(d){ return d[vars[i]]});
+		}
+		return o;
 	}
 
 	// Brushing
@@ -247,28 +249,18 @@ datebars = function(id, dat, xlab, ylab) {
 		
 		// Create statistics
 		if(interval.length > 0){
-			var timeFormat = d3.time.format.utc("%H:%M:%S");
-			duration = meanMax(interval, "Duration", 'duration');
-			duration[1] = timeFormat(new Date(duration[1]*1000));
-			duration[2] = timeFormat(new Date(duration[2]*1000));
-			var tab = [
-				meanMax(interval, "Distance (km)",'distance'),
-				duration,
-				meanMax(interval, "Avg Speed (km/h)", 'avgspeed'),
-				meanMax(interval, "Max Speed (km/h)", 'maxspeed'),
-				];
-			var colnms = ["", "Mean", "Max"];
-			tabulate(tab, colnms, statsTabParent);
+			var vars = ["duration", "distance", "avgspeed", "maxspeed"];
+			var mus = statistic(interval, d3.mean, vars); mus["label"] = "Mean";
+			var maxs = statistic(interval, d3.max, vars); maxs["label"] = "Max";
+			var mins = statistic(interval, d3.min, vars); mins["label"] = "Min";
+			stats = [mus, mins, maxs];
 
-			// Create list table
-			l = [];
-			head = varNamesForRun();
-			for (i=0; i<interval.length; i++){
-				l.push(listForRun(interval[i]));
-			}
-			var listTab = tabulate(l, head, listTabParent);
-			listTab.selectAll("tbody tr") 
-        		.sort(function(a, b) { return d3.descending(a[1], b[1]); });
+			tabulate(stats, runMapper, runMapper.statsorder, statsTabParent, true, true);
+			//tabulate(stats, runMapper, runMapper.statsorder, statsTabParent);
+
+			var listTab = tabulate(interval, runMapper, runMapper.order, listTabParent);
+			//listTab.selectAll("tbody tr") 
+        	//	.sort(function(a, b) { return d3.descending(a[1], b[1]); });
 		}
 	} // brushed()
 }

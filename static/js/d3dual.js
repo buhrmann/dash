@@ -11,8 +11,9 @@ dualFromJson = function(id, data) {
 
 	// Create table containers for pushing data into
 	var detailTabParent = "#detail .textdata";
-	emptyTable(detailTabParent, false, "detailTable", "table");
-	tabulate(tableForRun(data.stats, data['date']), null, detailTabParent);
+	emptyTable(detailTabParent, true, "detailTable", "table");
+	data.stats['date'] = data['date'];
+	tabulate([data.stats], runMapper, runMapper.order, detailTabParent, true);
 
 	// Draw main chart
 	duallines('#duallines', data.gps, 'cumdist', 'speedsmooth', 'elevation');
