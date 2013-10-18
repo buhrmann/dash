@@ -6,7 +6,8 @@
 var runs;
 var byDate;
 var selectedElem = null;
-var dateFormat = d3.time.format.utc("%Y-%m-%d");
+//var dateFormat = d3.time.format.utc("%Y-%m-%d");
+//var dateFormat = d3.time.format.utc("%Y-%m-%d");
 
 barsFromJson = function(elem, data) {
 
@@ -16,6 +17,32 @@ barsFromJson = function(elem, data) {
 	byDate = runs.dimension(function(d) { return d.date; });
 
 	datebars(elem, data, 'date', 'distance');	
+}
+
+//-------------------------------------------------------------------
+// Create horizontal lines at y values given in arr
+//-------------------------------------------------------------------
+gridlines = function(elem, arr, y, x1, x2){
+	var lines = elem.selectAll(".gridline").data(arr);
+
+	lines.attr({"y1" : function(d){ return y(d);},
+            	"y2" : function(d){ return y(d);}});
+
+	lines.enter().append("line")
+        .attr(
+        {
+        	"class" : "gridline",
+            "x1" : x1,
+            "x2" : x2,
+            "y1" : function(d){ return y(d);},
+            "y2" : function(d){ return y(d);},
+            "fill" : "none",
+            "shape-rendering" : "crispEdges",
+            "stroke" : "red",
+            "stroke-width" : "1px"
+        });
+
+   lines.exit().remove();
 }
 
 //-------------------------------------------------------------------
@@ -116,7 +143,7 @@ datebars = function(id, dat, xlab, ylab) {
 		.attr("height", function(d) { return height - y(d[ylab]); })
 		.attr("width", w)
 		.attr("class", "bar");	
-
+	
 	// context brush
 	var context = 1;
 	if (context){
@@ -160,7 +187,7 @@ datebars = function(id, dat, xlab, ylab) {
 		// Create table containers for pushing data into
 		emptyTable(statsTabParent, true, "statsTable", "table");
 		emptyTable(detailTabParent, true, "detailTable", "table");
-		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover");
+		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover table-condensed");
 
 		// First update with initial extent
 		brushed();
@@ -267,6 +294,10 @@ datebars = function(id, dat, xlab, ylab) {
 
 			//listTab.selectAll("tbody tr") 
         	//	.sort(function(a, b) { return d3.descending(a[1], b[1]); });
+
+
+			// Grid lines
+			gridlines(focus, [mus['distance']], y, 0, width);
 		}
 	} // brushed()
 }

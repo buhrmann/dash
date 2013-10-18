@@ -1,5 +1,6 @@
 var timeFormat = d3.time.format.utc("%H:%M:%S");
 var dateFormat = d3.time.format("%Y-%m-%d");
+//var dateFormat = d3.time.format("%a %d of %B %Y");
 
 var runMapper = new Object();
 runMapper.label = {"label" : "", "mapper" : function(x) { return x;} };
@@ -8,7 +9,7 @@ runMapper.duration = {"label" : "Duration", "mapper" : function(x) { return time
 runMapper.avgspeed = {"label" : "Avg Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.maxspeed = {"label" : "Max Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.date = {"label" : "Date", "mapper" : function(x) { return dateFormat(x);} };
-runMapper.order = ["date", "distance", "duration", "avgspeed"];
+runMapper.order = ["date", "distance", "duration", "avgspeed", "maxspeed"];
 runMapper.statsorder = ["label", "distance", "duration", "avgspeed", "maxspeed"];
 
 //-------------------------------------------------------------------
@@ -76,9 +77,15 @@ function tabulate(data, mapper, vars, parent, transposed, hasLabels){
 	if(transposed){
 		var matrix = toMatrixTranspose(data, mapper, vars);
 		if(hasLabels){
+			// Assume label was first column, therefore now in first row
+			// Then cut of row with labels
 			var labels = matrix[0];
 			labels[0] = "";
 			matrix = matrix.splice(1, matrix.length);
+		}
+		else{
+			// Create empty labels so we still get a nice table header line
+			var labels = matrix[0].map(function(k){return "";})
 		}
 	}
 	else{

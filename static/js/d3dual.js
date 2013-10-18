@@ -128,23 +128,28 @@ duallines = function(id, dat, xlab, y1lab, y2lab) {
 		.attr("class", "focus")
 		.style("display", "none");
 
-    focus.append("circle")
-		.attr("class", "tip")
-		.attr("r", 4);
+	var tip = focus.append("g")
+		.attr("transform", "translate(0,-5)");
 
-	focus.append("rect")
+	tip.append("polygon")
 		.attr("class", "tip")
-		.attr("width", 50)
-		.attr("height", 20)
+		.attr("points", [[-5,-10],[5,-10],[0,0]])
+		.attr("stroke-width", "2px");
+
+	tip.append("rect")
+		.attr("class", "tip")
+		.attr("width", 60)
+		.attr("height", 25)
 		.attr("rx", 2)
 		.attr("ry", 2)
-		.attr("x", "-25")
-		.attr("y", "-30");
+		.attr("x", "-30")
+		.attr("y", "-35");
 
-	focus.append("text")
+	tip.append("text")
 		.attr("class", "tip")
-		.attr("y", "-16")
-		.attr("text-anchor", "middle"); 
+		.attr("y", "-22.5")
+		.attr("text-anchor", "middle")
+		.attr("alignment-baseline", "middle"); 
 
 	// Track mouse position on chart
 	svg.append("rect")
