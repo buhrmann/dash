@@ -10,3 +10,8 @@ textarea,
 body {
 	background: #fff;
 }
+
+
+.table { 
+	empty-cells: show; 
+}

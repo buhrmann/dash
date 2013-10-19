@@ -13,7 +13,7 @@ dualFromJson = function(id, data) {
 	var detailTabParent = "#detail .textdata";
 	emptyTable(detailTabParent, true, "detailTable", "table");
 	data.stats['date'] = data['date'];
-	tabulate([data.stats], runMapper, runMapper.order, detailTabParent, true);
+	tabulate([data.stats], runMapper, runMapper.order, detailTabParent, false);
 
 	// Draw main chart
 	duallines('#duallines', data.gps, 'cumdist', 'speedsmooth', 'elevation');

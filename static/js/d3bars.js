@@ -52,9 +52,9 @@ datebars = function(id, dat, xlab, ylab) {
 
 	// Setup
 	var outFormat = d3.time.format("%Y-%m-%d");
-	var margin = {top: 10, right: 40, bottom: 100, left: 40};
-	var margin2 = {top: 430, right: 40, bottom: 20, left: 40}
-	var width = 700 - margin.left - margin.right;
+	var margin = {top: 10, right: 40, bottom: 100, left: 30};
+	var margin2 = {top: 430, right: 40, bottom: 20, left: 30}
+	var width = 900 - margin.left - margin.right;
 	var height = 500 - margin.top - margin.bottom;
 	var height2 = 500 - margin2.top - margin2.bottom;
 
@@ -185,8 +185,8 @@ datebars = function(id, dat, xlab, ylab) {
 			.attr("class", "bar");	    
 
 		// Create table containers for pushing data into
-		emptyTable(statsTabParent, true, "statsTable", "table");
-		emptyTable(detailTabParent, true, "detailTable", "table");
+		emptyTable(statsTabParent, true, "statsTable", "table table-condensed");
+		emptyTable(detailTabParent, true, "detailTable", "table table-condensed");
 		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover table-condensed");
 
 		// First update with initial extent
@@ -211,7 +211,7 @@ datebars = function(id, dat, xlab, ylab) {
 		d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
 
 		// Update single run tabular widget
-		tabulate([run], runMapper, runMapper.order, detailTabParent, true, false);
+		tabulate([run], runMapper, runMapper.order, detailTabParent, false, false);
 	}
 
 	// Select last run initially
