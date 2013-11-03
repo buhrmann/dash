@@ -6,12 +6,25 @@
 var runs;
 var byDate;
 var selectedElem = null;
-//var dateFormat = d3.time.format.utc("%Y-%m-%d");
-//var dateFormat = d3.time.format.utc("%Y-%m-%d");
+var dates = {};
+var monthStr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 barsFromJson = function(elem, data) {
 
 	data.forEach(function(d){ d.date = dateFormat.parse(d.date); });
+
+	// Data comes in sorted by date !
+	nestedDates = d3.nest()
+		.key(function(d) { return d.date.getFullYear(); })
+		.key(function(d) { return d.date.getMonth(); })
+		.rollup(function(leaves) { return leaves.length > 0; })
+		.map(data, d3.map);	
+
+	nestedDates.forEach(function(year, months) {
+    	dates[year] = months.keys().map(function(d) { return monthStr[parseInt(d)]; });
+	});
+
+	d3.select("#date-selector").append
 
 	runs = crossfilter(data);
 	byDate = runs.dimension(function(d) { return d.date; });

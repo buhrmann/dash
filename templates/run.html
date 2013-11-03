@@ -8,7 +8,7 @@
   {% if data %}
     <div id="duallines">
     	<h3>Individual run</h3>
-    	<p>Speed in km/h and elevation in m as a function of distance.</p>
+      <p>Speed in km/h and elevation in m as a function of distance.</p>
     </div>
   {% endif %}
 {% endblock %}
@@ -17,9 +17,9 @@
   {% if data %}
     <div id="detail">
     	<h3>Detail</h3>
-    	<p>Data for this run.</p>
-    	<div class="textdata"></div> 
-    	<a href=""></a>   	
+      <p>Data for this run.</p>
+    	<div class="textdata"></div>    	
+      <a href=""></a>
     </div>
   {% endif %}
 {% endblock %}
@@ -27,6 +27,6 @@
 {% block js_footer %}
 	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
 	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>		
-	<script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script>	
-	<script type="text/javascript">dualFromJson("#duallines", {{data|safe}});</script>
+  <script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script> 
+  <script type="text/javascript">dualFromJson("#duallines", {{data|safe}});</script>
 {% endblock %}

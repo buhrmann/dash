@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block head %}
+	{{ super() }}
+	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
+{% endblock %}
+
+{% block content %}
+  {% if data %}
+    <div id="scatterplot">
+    	<h3>Correlations</h3>
+      <p>Simple linear regression for selected pair of variables. The third option is encoded in the size of dots.</p>
+      <div class="varselector"></div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block side1 %}
+  {% if data %}
+    <div id="detail">
+    	<h3>Detail</h3>
+    	<div class="textdata"></div> 
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block js_footer %}
+	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/d3.tip.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/sylvester.min.js')}}></script>
+	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>			
+  <script type="text/javascript" src={{url_for('static', filename='js/d3scatter.js')}}></script>
+  <script type="text/javascript">scatterFromJson("#scatterplot", {{data|safe}});</script>
+{% endblock %}

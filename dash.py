@@ -150,6 +150,12 @@ def show_runs():
 	js = json.dumps(s)
 	return render_template('runs.html', data=js)
 
+@app.route('/stats')
+def show_stats():
+	s = statsAll()
+	js = json.dumps(s)
+	return render_template('stats.html', data=js)
+
 @app.route('/runs/<date>')
 def show_run(date):
 	data = runForDate(datetime.datetime.strptime(date, "%Y-%m-%d"))
