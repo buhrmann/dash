@@ -8,9 +8,10 @@ runMapper.distance = {"label" : "Distance", "mapper" : function(x) { return x.to
 runMapper.duration = {"label" : "Duration", "mapper" : function(x) { return timeFormat(new Date(x*1000));} };
 runMapper.avgspeed = {"label" : "Avg Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.maxspeed = {"label" : "Max Speed", "mapper" : function(x) { return x.toFixed(2);} };
+runMapper.temp = {"label" : "Temp", "mapper" : function(x) { return x.toFixed(1);} };
 runMapper.date = {"label" : "Date", "mapper" : function(x) { return dateFormat(x);} };
-runMapper.order = ["date", "distance", "duration", "avgspeed", "maxspeed"];
-runMapper.statsorder = ["label", "distance", "duration", "avgspeed", "maxspeed"];
+runMapper.order = ["date", "distance", "duration", "avgspeed", "maxspeed", "temp"];
+runMapper.statsorder = ["label", "distance", "duration", "avgspeed", "maxspeed", "temp"];
 
 //-------------------------------------------------------------------
 // Converts a single object of (k,v) pairs into a list of 
@@ -45,7 +46,8 @@ function toMatrixTranspose(data, mapper, vars){
 		var v = vars[i];
 		row = new Array(numRows + 1);
 		row[0] = mapper[v].label;
-		for (var j=0; j<numRows; j++){			
+		for (var j=0; j<numRows; j++){	
+			console.log(data[j][v])
 			row[j+1] = mapper[v].mapper(data[j][v]);
 		}
 		matrix.push(row);

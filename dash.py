@@ -51,6 +51,9 @@ def runs():
 
 runs = runs()		
 
+# ------------------------------------------------------------------------
+def run(nid):
+	return runs.find_one({'nid' : nid})
 
 # ------------------------------------------------------------------------
 def ids():
@@ -105,6 +108,26 @@ def processAll(recalc=False):
 		process(run)
 		runs.save(run)		
 		i += 1
+
+# ------------------------------------------------------------------------
+def addTemps(redoall=False):
+	if redoall:
+		cursor = runs.find()
+	else:
+		cursor = runs.find( {"$or": [
+			{"stats.temp" : {"$exists" : False}},
+			{"stats.temp" : None}
+			]} )
+	n = cursor.count()
+	i = 1
+	for run in cursor:
+		print "Retrieving temperature for run " + str(i) + " of " + str(n)
+		t = stats.temperature(run['date'], "placeholder")
+		print t
+		if t is not None:
+			run['stats']['temp'] = t
+			runs.save(run)		
+		i += 1		
 
 # ------------------------------------------------------------------------
 def statsPeriod(s, e):

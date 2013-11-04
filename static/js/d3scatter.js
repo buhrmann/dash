@@ -1,11 +1,12 @@
 var data;
-var vars = ["distance", "avgspeed", "duration", "maxspeed"];
+var vars = ["distance", "avgspeed", "duration", "maxspeed", "temp"];
 var xLabSel = vars[0];
 var yLabSel = vars[1];
 var zLabSel = vars[2];
 
 // Setup
-var include0 = false;
+var includeY0 = false;
+var includeX0 = false;
 var margin = {top: 10, right: 40, bottom: 100, left: 40};
 var width = 800 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
@@ -160,7 +161,7 @@ drawline = function(factors, x1, x2, xscale, yscale){
 	    {
 	        "x1" : xscale(x1),
 	        "x2" : xscale(x2),
-	        "y1" : yscale(factors[0]),
+	        "y1" : yscale(factors[0] + factors[1]*x1),
 	        "y2" : yscale(factors[0] + factors[1]*x2),
     });
 
@@ -171,7 +172,7 @@ drawline = function(factors, x1, x2, xscale, yscale){
 	    	"class" : "line",
 	        "x1" : xscale(x1),
 	        "x2" : xscale(x2),
-	        "y1" : yscale(factors[0]),
+	        "y1" : yscale(factors[0] + factors[1]*x1),
 	        "y2" : yscale(factors[0] + factors[1]*x2),
 	        "fill" : "none",
 	        "shape-rendering" : "crispEdges",
@@ -186,12 +187,15 @@ drawline = function(factors, x1, x2, xscale, yscale){
 // and therefore the position of dots in the chart
 //-------------------------------------------------------------------
 updateScatter = function() {
-	
-	xdomain = [0, d3.max(data, function(d) { return d[xLabSel]; })];
+
+	if (includeX0)	
+		xdomain = [0, d3.max(data, function(d) { return d[xLabSel]; })];
+	else
+		xdomain = d3.extent(data, function(d) { return d[xLabSel]; });
 	var x = d3.scale.linear().domain(xdomain).nice().rangeRound([0, width]); 
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
 
-	if (include0)
+	if (includeY0)
 		ydomain = [0, d3.max(data, function(d) { return d[yLabSel]; })];
 	else
 		ydomain = d3.extent(data, function(d) { return d[yLabSel]; });
@@ -217,16 +221,22 @@ updateScatter = function() {
 		.text(runMapper[yLabSel]["label"]);;
 
 	factors = linearRegression(data, xLabSel, yLabSel);
-	drawline(factors, 0, xdomain[1], x, y);
+	drawline(factors, x.domain()[0], x.domain()[1], x, y);
 }
 
+//-------------------------------------------------------------------
+// Scatter selected variables and draws a regression line
+//-------------------------------------------------------------------
 scatter = function(id, dat, xlab, ylab, zlab) {
 
 	// Create scales and axis
-	xdomain = [0, d3.max(dat, function(d) { return d[xlab]; })];
+	if (includeX0)	
+		xdomain = [0, d3.max(data, function(d) { return d[xLabSel]; })];
+	else
+		xdomain = d3.extent(data, function(d) { return d[xLabSel]; });
 	var x = d3.scale.linear().domain(xdomain).nice().rangeRound([0, width]); 
 
-	if (include0)
+	if (includeY0)
 		var ydomain = [0, d3.max(dat, function(d) { return d[ylab]; })];
 	else
 		var ydomain = d3.extent(dat, function(d) { return d[ylab]; });
@@ -290,6 +300,6 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 
 	// Draw regression line
 	factors = linearRegression(dat, xlab, ylab);
-	drawline(factors, 0, xdomain[1], x, y);
+	drawline(factors, x.domain()[0], x.domain()[1], x, y);
 }
 	

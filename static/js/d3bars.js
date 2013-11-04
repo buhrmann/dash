@@ -24,7 +24,7 @@ barsFromJson = function(elem, data) {
     	dates[year] = months.keys().map(function(d) { return monthStr[parseInt(d)]; });
 	});
 
-	d3.select("#date-selector").append
+	//d3.select("#date-selector").append
 
 	runs = crossfilter(data);
 	byDate = runs.dimension(function(d) { return d.date; });
@@ -289,7 +289,7 @@ datebars = function(id, dat, xlab, ylab) {
 		
 		// Create statistics
 		if(interval.length > 0){
-			var vars = ["duration", "distance", "avgspeed", "maxspeed"];
+			var vars = ["duration", "distance", "avgspeed", "maxspeed", "temp"];
 			var mus = statistic(interval, d3.mean, vars); mus["label"] = "Mean";
 			var maxs = statistic(interval, d3.max, vars); maxs["label"] = "Max";
 			var mins = statistic(interval, d3.min, vars); mins["label"] = "Min";
