@@ -3,18 +3,22 @@ var vars = ["distance", "avgspeed", "duration", "maxspeed", "temp"];
 var xLabSel = vars[0];
 var yLabSel = vars[1];
 var zLabSel = vars[2];
+var cLabSel = vars[4];
+
+var selectedElem = null;
+var detailTabParent = "#detail .textdata";
 
 // Setup
 var includeY0 = false;
 var includeX0 = false;
-var margin = {top: 10, right: 40, bottom: 100, left: 40};
+var margin = {top: 10, right: 40, bottom: 40, left: 40};
 var width = 800 - margin.left - margin.right;
-var height = 500 - margin.top - margin.bottom;
+var height = 400 - margin.top - margin.bottom;
 
 //-------------------------------------------------------------------
-// Menu for variables with ith element selected by default
+// Menu for variable varid with "selected" element selected by default
 //-------------------------------------------------------------------
-buildDropDown = function(varid, label){
+buildDropDown = function(varid, selected, label){
 
 	d3.select(".varselector").append("div")
 		.attr("class", "col-md-2")
@@ -28,7 +32,7 @@ buildDropDown = function(varid, label){
 				.selectAll("option")
 				.data(vars).enter().append("option")
 				    .attr("value", function(d){ return d; }) /* Optional */
-				    .attr("selected", function(d) { if (d==vars[varid]) return "selected";})
+				    .attr("selected", function(d) { if (d==selected) return "selected";})
 				    .text(function(d){ return runMapper[d]["label"]; });
 }
 
@@ -41,9 +45,10 @@ scatterFromJson = function(elem, dat) {
 	data.forEach(function(d){ d.date = dateFormat.parse(d.date); });
 	data.forEach(function(d){ d.duration = d.duration / 3600; });
 
-	buildDropDown(0, "x-Axis");
-	buildDropDown(1, "y-Axis");
-	buildDropDown(2, "Size");
+	buildDropDown(0, xLabSel, "x-Axis");
+	buildDropDown(1, yLabSel, "y-Axis");
+	buildDropDown(2, zLabSel, "Size");
+	buildDropDown(3, cLabSel, "Color");
 
 	scatter(elem, data, xLabSel, yLabSel, zLabSel);	
 }
@@ -53,16 +58,17 @@ scatterFromJson = function(elem, dat) {
 //-------------------------------------------------------------------
 selectVars = function(){
 	var varid = this.id;
+	var val = this.options[this.selectedIndex].value;
 	if(varid == 0)
-		xLabSel = this.options[this.selectedIndex].value;
+		xLabSel = val;
 	else if(varid == 1)
-		yLabSel = this.options[this.selectedIndex].value;
+		yLabSel = val;
 	else if(varid == 2)
-		zLabSel = this.options[this.selectedIndex].value;
+		zLabSel = val;
+	else if(varid == 3)
+		cLabSel = val;
 
-	console.log(xLabSel, yLabSel, zLabSel);
-
-	updateScatter()
+	updateScatter();
 }
 
 //-------------------------------------------------------------------
@@ -182,6 +188,29 @@ drawline = function(factors, x1, x2, xscale, yscale){
 }
 
 //-------------------------------------------------------------------
+// Extract info for selected run
+//-------------------------------------------------------------------
+function hovered(run, elem) {
+
+	if(elem != selectedElem)
+	{
+		if(selectedElem != null)
+			selectedElem.classed("selected", false);
+
+		elem.classed("selected", true);
+		selectedElem = elem;
+	}
+
+	// Update link to single run view
+	var dateStr = dateFormat(run['date']);
+	lnk = "View in more detail."
+	d3.select("#detail a").text(lnk).attr("href", "runs/" + dateStr).style("cursor","pointer");
+
+	// Update single run tabular widget
+	tabulate([run], runMapper, runMapper.order, detailTabParent, false, false);
+	}
+
+//-------------------------------------------------------------------
 // Update scatter chart
 // In this case the data is not actually changing but only the axes,
 // and therefore the position of dots in the chart
@@ -205,12 +234,18 @@ updateScatter = function() {
 	zdomain = d3.extent(data, function(d) { return d[zLabSel]; });
 	var z = d3.scale.linear().domain(zdomain).range([2,10]);
 
+	cdomain = d3.extent(data, function(d) { return d[cLabSel]; });
+	var c = d3.scale.linear().domain(cdomain).range(['blue','red']);
+
 	// update existing	
 	var dots = d3.selectAll(".dot")
 		.transition().duration(200)
 		.attr("cx", function(d) { return x(d[xLabSel]); })
 		.attr("cy", function(d) { return y(d[yLabSel]); })
 		.attr("r", function(d) { return z(d[zLabSel]); });
+
+	var dots = d3.selectAll(".dot")
+	  	.style("fill", function(d) { return c(d[cLabSel]); });
 
 	d3.select(".x.axis").call(xAxis)
 		.select(".axisLabel")
@@ -237,14 +272,17 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 	var x = d3.scale.linear().domain(xdomain).nice().rangeRound([0, width]); 
 
 	if (includeY0)
-		var ydomain = [0, d3.max(dat, function(d) { return d[ylab]; })];
+		var ydomain = [0, d3.max(dat, function(d) { return d[yLabSel]; })];
 	else
-		var ydomain = d3.extent(dat, function(d) { return d[ylab]; });
+		var ydomain = d3.extent(dat, function(d) { return d[yLabSel]; });
 	var y = d3.scale.linear().domain(ydomain).nice().range([height, 0]);
 
 	//zdomain = [0, d3.max(dat, function(d) { return d[zlab]; })];
-	zdomain = d3.extent(dat, function(d) { return d[zlab]; });
+	zdomain = d3.extent(dat, function(d) { return d[zLabSel]; });
 	var z = d3.scale.linear().domain(zdomain).range([2,10]);
+
+	cdomain = d3.extent(dat, function(d) { return d[cLabSel]; });
+	var c = d3.scale.linear().domain(cdomain).range(['blue','red']);
 
 	// Create axes
 	var xAxis = d3.svg.axis().scale(x).orient("bottom")
@@ -291,15 +329,20 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 	var dots = svg.selectAll(".dot")
 		.data(dat, function(d) { return d[xlab]; })
 		.enter().append("svg:circle")
-		.on('mouseover', function(d) { tip.show(d); } )
-		.on('mouseout', tip.hide)
-		.attr("cx", function(d) { return x(d[xlab]); })
-		.attr("cy", function(d) { return y(d[ylab]); })
-		.attr("r", function(d) { return z(d[zlab]); })
+		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
+		//.on('mouseout', tip.hide)
+		.attr("cx", function(d) { return x(d[xLabSel]); })
+		.attr("cy", function(d) { return y(d[yLabSel]); })
+		.attr("r", function(d) { return z(d[zLabSel]); })
+	  	.style("fill", function(d) { return c(d[cLabSel]); })
 		.attr("class", "dot");	
 
+	// Select last run initially
+	emptyTable(detailTabParent, true, "detailTable", "table table-condensed");	
+	hovered(dat[dat.length - 1], null);
+
 	// Draw regression line
-	factors = linearRegression(dat, xlab, ylab);
+	factors = linearRegression(dat, xLabSel, yLabSel);
 	drawline(factors, x.domain()[0], x.domain()[1], x, y);
 }
 	

@@ -55,6 +55,21 @@ gridlines = function(elem, arr, y, x1, x2){
             "stroke-width" : "1px"
         });
 
+    mlab = elem.selectAll(".meanLabel").data(arr);
+	mlab.attr("y", y(arr[0]))
+		.attr("x", x2);
+
+	mlab.enter().append("text")
+		.attr("class", "meanLabel")
+		.style("text-anchor", "end")
+		.style("fill", "red")
+		.text("mean")
+		.attr("y", y(arr[0]))
+		.attr("dy", -4)
+		.attr("x", x2);
+
+		  
+
    lines.exit().remove();
 }
 
@@ -398,8 +413,8 @@ bars = function(id, dat, scaleType) {
 	var bars = svg.selectAll(".bar")
 		.data(dat)
 		.enter().append("rect")
-		.on('mouseover', tip.show)
-		.on('mouseout', tip.hide);
+		.on('mouseover', tip.show);
+		//.on('mouseout', tip.hide);
 
 	if (scaleType == "linear"){
 		var w = (width / dat.length) - 2;

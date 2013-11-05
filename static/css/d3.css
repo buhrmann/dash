@@ -46,6 +46,7 @@ svg .dot.selected {
     cursor: pointer;
 }
 
+
 svg path.line {
   fill: none;
   stroke: #000;
