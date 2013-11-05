@@ -92,6 +92,11 @@ def process(run, recalc=False):
 	stat = stats.stats(df)
 	run['stats'] = stat
 
+	# Add temperature
+	t = stats.temperature(run['date'], "placeholder")
+	if t is not None:
+		run['stats']['temp'] = t
+
 	#getRuns().update({"_id" : nid}, {"$set" : {"stats" : stats, "gps" : rows}})		
 
 # ------------------------------------------------------------------------
