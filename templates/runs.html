@@ -8,7 +8,7 @@
   {% if data %}
     <div id="datebars">
     	<h3>All my runs</h3>
-    	<p> Distance of all runs in km arranged by date. Select a run by hovering over its bar and view the its details below. Use the brush to focus on a specific period and view the corresponding statistics in the table underneath. The details for all selected runs are presented in another table at the bottom. A red horizontal line indicates the mean distance for the selected period. </p>
+    	<p> Distance of all runs in km, arranged by date. Select a run by hovering over the bars and view the its details below. Use the brush to focus on a specific period and view the corresponding statistics in the table underneath. Numerical details for all selected runs are presented in another table at the bottom. A red horizontal line indicates the mean distance for the selected period. </p>
     	<div id="date-selector"></div>
     </div>
   {% endif %}
@@ -28,9 +28,8 @@
   {% if data %}
     <div id="detail">
     	<h3>Selected run</h3>
-    	<p>Numerical detail for selected run. Distances in km, speed in km/h and temperature in degree celsius.<br>&nbsp;</p>
+    	<p>Numerical detail for selected run. Distances in km, speed in km/h and temperature in degree celsius. <a href=""></a></p>
     	<div class="textdata"></div> 
-    	<a href=""></a>   	
     </div>
   {% endif %}
 {% endblock %}

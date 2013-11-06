@@ -47,7 +47,7 @@ function toMatrixTranspose(data, mapper, vars){
 		row = new Array(numRows + 1);
 		row[0] = mapper[v].label;
 		for (var j=0; j<numRows; j++){	
-			console.log(data[j][v])
+			//console.log(data[j][v])
 			row[j+1] = mapper[v].mapper(data[j][v]);
 		}
 		matrix.push(row);

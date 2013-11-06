@@ -8,7 +8,7 @@
   {% if data %}
     <div id="scatterplot">
     	<h3>Correlations</h3>
-      <p>Simple linear regression for selected pair of variables. The third option is encoded in the size of dots.</p>
+      <p>A scatter plot and simple linear regression for a selected pair of run parameters. The third and fourth parameters are encoded in the size and color of dots respectively.</p>
       <div class="varselector"></div>
     </div>
   {% endif %}
@@ -31,7 +31,4 @@
 	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>			
   <script type="text/javascript" src={{url_for('static', filename='js/d3scatter.js')}}></script>
   <script type="text/javascript">scatterFromJson("#scatterplot", {{data|safe}});</script>
-});</script>
-
-
 {% endblock %}
