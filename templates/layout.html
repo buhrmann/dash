@@ -9,13 +9,10 @@
       <meta name="keywords" content="">
       <meta name="author" content="">            
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-      <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}">-->
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
       <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
       <script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}; </script>
-      <!--
-      <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
-      -->
+      <!-- <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet"> -->
     {% endblock %}
   </head>
   <body>
@@ -29,12 +26,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{{url_for('show_runs')}}">Dash+</a>
+          <a class="navbar-brand" href="{{url_for('index')}}">Dash+</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="{{url_for('show_runs')}}">Overview</a></li>
-            <li><a href="{{url_for('show_stats')}}">Statistics</a></li>
+            <li><a href="{{url_for('index')}}">Overview</a></li>
+            <li><a href="{{url_for('show_runs')}}">Runs</a></li>
+            <li><a href="{{url_for('show_stats')}}">Analysis</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>

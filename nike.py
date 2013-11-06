@@ -5,6 +5,7 @@ import sys
 accessToken = "860a6bdb7e7bd3ed0f70a7778cdf723c"
 baseurl = "https://api.nike.com/me/sport/activities/"
 
+# ------------------------------------------------------------------------
 def jsonFromUrl(url):
 	req = urllib2.Request(url)
 	req.add_header("appid", "fuelband")
@@ -21,6 +22,7 @@ def jsonFromUrl(url):
 	return js
 
 # Converts activityId strings to integers
+# ------------------------------------------------------------------------
 def listNikeRuns(max=2, count=2):
 	print "Retrieving list of runs on nike+ server..."
 	ids = []
@@ -38,6 +40,7 @@ def listNikeRuns(max=2, count=2):
 
 # Assumes runId is an integer. 
 # Returns a dictionary with run data that can be inserted into mongodb.
+# ------------------------------------------------------------------------
 def getNikeRun(runId):
 	# Retrieve gps data
 	print "Retrieving run " + str(runId) + " from nike server..."

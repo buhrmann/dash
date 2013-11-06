@@ -169,7 +169,9 @@ def count():
 # ------------------------------------------------------------------------
 @app.route('/')
 def index():
-	return redirect(url_for('show_runs'))
+	s = statsAll()
+	js = json.dumps(s)
+	return render_template('overview.html', data=js)	
 
 @app.route('/runs')
 @app.route('/runs/')

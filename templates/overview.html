@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block head %}
+	{{ super() }}
+	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
+{% endblock %}
+
+{% block content %}
+  {% if data %}
+    <div class="page-header">
+    	<h1>Overview <small>personal records</small></h3>
+    </div>
+
+    <!-- badges -->
+    <div id="overview">
+      <div class="row">
+        <div class="col-md-3 col-sm-3">          
+          <div class="mybadge" id="total">
+            <div class="mylabel">total</div>
+            <span class="number">23.7</span>
+            km
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">          
+          <div class="mybadge" id="farthest">
+            <div class="mylabel">farthest</div>
+            <span class="number">23.7</span>
+            km
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="mybadge" id="avgdist">
+            <div class="mylabel">avg distance</div>
+            <span class="number">23.7</span>
+            km
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3">
+          <div class="mybadge" id="avgspeed">
+            <div class="mylabel">avg speed</div>
+            <span class="number">23.7</span>
+            km/h
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- last n -->
+    <div class="page-header">
+      <h1>Last 3 runs <small>overview</small></h3>        
+    </div>
+    <div>
+      <div id="table"></div>
+    </div>
+
+  {% endif %}
+{% endblock %}
+
+{% block js_footer %}
+	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>  
+  <script type="text/javascript" src={{url_for('static', filename='js/overview.js')}}></script>
+  <script type="text/javascript">records({{data|safe}});</script>
+{% endblock %}

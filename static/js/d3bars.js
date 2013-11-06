@@ -99,7 +99,7 @@ datebars = function(id, dat, xlab, ylab) {
 	var first = d3.time.day.offset(dat[0][xlab], -1);
 	var last = d3.time.day.offset(dat[dat.length - 1][xlab], 1)
 	domain = [first, last]
-	var x = d3.time.scale().domain(domain).nice().rangeRound([0, width]); 
+	var x = d3.time.scale().domain(domain).rangeRound([0, width]); 
 
 	if (include0)
 		var ydomain = [0, d3.max(dat, function(d) { return d[ylab]; })];
@@ -175,7 +175,7 @@ datebars = function(id, dat, xlab, ylab) {
 	// context brush
 	var context = 1;
 	if (context){
-		var x2 = d3.time.scale().domain(domain).nice().rangeRound([0, width]); 
+		var x2 = d3.time.scale().domain(domain).rangeRound([0, width]); 
 		var y2 = d3.scale.linear().domain(y.domain()).nice().range([height2, 0]);
 
 		var xAxis2 = d3.svg.axis().scale(x2).orient("bottom").tickFormat(d3.time.format("%d %b"));

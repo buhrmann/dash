@@ -6,9 +6,11 @@
 
 {% block content %}
   {% if data %}
-    <div id="datebars">
-    	<h3>All my runs</h3>
+    <div class="page-header">
+    	<h1>Runs <small>quick glance</small></h3>
     	<p> Distance of all runs in km, arranged by date. Select a run by hovering over the bars and view the its details below. Use the brush to focus on a specific period and view the corresponding statistics in the table underneath. Numerical details for all selected runs are presented in another table at the bottom. A red horizontal line indicates the mean distance for the selected period. </p>
+    </div>
+    <div id="datebars">
     	<div id="date-selector"></div>
     </div>
   {% endif %}

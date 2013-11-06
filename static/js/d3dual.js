@@ -25,7 +25,7 @@ dualFromJson = function(id, data) {
 duallines = function(id, dat, xlab, y1lab, y2lab) {
 
 	var margin = {top: 10, right: 40, bottom: 40, left: 40};
-	var width = 700 - margin.left - margin.right;
+	var width = 800 - margin.left - margin.right;
 	var height = 300 - margin.top - margin.bottom;
 	yscalar = 1.0
 
