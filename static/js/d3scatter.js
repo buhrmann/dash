@@ -11,7 +11,7 @@ var detailTabParent = "#detail .textdata";
 // Setup
 var includeY0 = false;
 var includeX0 = false;
-var margin = {top: 10, right: 40, bottom: 40, left: 40};
+var margin = {top: 10, right: 40, bottom: 40, left: 30};
 var width = 800 - margin.left - margin.right;
 var height = 400 - margin.top - margin.bottom;
 
@@ -345,4 +345,80 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 	factors = linearRegression(dat, xLabSel, yLabSel);
 	drawline(factors, x.domain()[0], x.domain()[1], x, y);
 }
+
+//-------------------------------------------------------------------
+// Histogram for all variabels
+//-------------------------------------------------------------------
+histAll = function(id, dat) {
+
+	dat.forEach(function(d){ d.duration = d.duration / 3600; });
+	vars.forEach(function(v) { if (v != "maxspeed") hist(id, dat, v); });
+}
+
+
+//-------------------------------------------------------------------
+// Histogram of selected variable
+//-------------------------------------------------------------------
+hist = function(id, dat, lab) {
+
+	var marginHist = margin; marginHist.right = 10;
+	var widthHist = width/4 - 3*marginHist.right;
+	var heightHist = 120 - marginHist.top - marginHist.bottom;
+
+	// A formatter for counts.
+	var formatCount = d3.format(",.0f");
+
+	//d1 = Math.round(d3.max(dat, function(d) { return d[lab]; }));
+	//d0 = Math.round(d3.min(dat, function(d) { return d[lab]; }));
+	domain = d3.extent(dat, function(d) { return d[lab]; });
+	var x = d3.scale.linear().domain(domain).nice().range([0, widthHist]);
+
+	// Generate a histogram using twenty uniformly-spaced bins.
+	var data = d3.layout.histogram().bins(x.ticks(20)) (arrayForKey(dat, lab));
+
+	var y = d3.scale.linear()
+		.domain([0, d3.max(data, function(d) { return d.y; })]).nice()
+    	.range([heightHist, 0]);
+
+	var xAxis = d3.svg.axis().scale(x).orient("bottom");//.tickFormat(runMapper[lab]['mapper']);
+	var yAxis = d3.svg.axis().scale(y).ticks(5).orient("left");
+
+	var svg = d3.select(id).append("svg")
+	    .attr("width", widthHist + marginHist.left + marginHist.right)
+	    .attr("height", heightHist + marginHist.top + marginHist.bottom)
+  		.append("g")
+    		.attr("transform", "translate(" + marginHist.left + "," + marginHist.top + ")");
+
+    // A container for each bar, which'll hold both the rect as well as txt
+	var bars = svg.selectAll(".bar").data(data).enter().append("g")
+	    .attr("class", "bar")
+	    .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+
+    bars.append("rect")
+	    .attr("x", 1)
+	    .attr("width", x(data[1].x) - x(data[0].x) - 1)
+	    .attr("height", function(d) { return heightHist - y(d.y); }); 
+
+	svg.append("g")
+		.attr("class", "x axis")
+	    .attr("transform", "translate(0," + heightHist + ")")
+	    .call(xAxis)
+	    .append("text")
+		  .attr("y", 30)
+		  .attr("x", widthHist/2)
+		  .attr("class", "axisLabel")
+		  .style("text-anchor", "middle")
+		  .text(runMapper[lab]["label"]);;
+
+	svg.append("g")
+		.attr("class", "y axis")
+	    .call(yAxis)
+	    .append("text")
+		  .attr("transform", "rotate(-90)")
+		  .attr("y", 6)
+		  .attr("dy", ".71em")
+		  .style("text-anchor", "end")
+		  .text("freq");
+}
+
 	

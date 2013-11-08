@@ -2,16 +2,17 @@
 {% block head %}
 	{{ super() }}
 	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
-{% endblock %}
+{% endblock %}    
 
 {% block content %}
+  <div class="jumbotron">
+    <h1><span class="text-primary">Dash+</span> <small>visual display of running data</small></h1>
+    <p class="lead">A python web application built with <a href="http://flask.pocoo.org/">Flask</a> that imports <a href="http://nikeplus.nike.com/plus/">Nike+</a> running data into a NoSQL database (<a href="http://www.mongodb.org/">MongoDB</a>) and uses <a href="http://d3js.org/">D3.js</a> to <a href="{{url_for("show_runs")}}">visualize</a> and <a href="{{url_for("show_stats")}}">analyze</a> it. Source code can be found on <a href="https://github.com/synergenz/dash">github</a>.</p>
+  </div>
+
   {% if data %}
-    <div class="jumbotron">
-      <h1>Dash+ <small>Visual analysis of gps running data.</small></h1>
-      <p>A Flask application using d3.js to analyze and visualize running data collected from Nike+ and stored locally in a MongoDB.</p>
-    </div>
     <div class="page-header">
-    	<h1>Records <small>all time</small></h3>
+      <h1>Records <small>all time</small></h3>
     </div>
 
     <!-- badges -->

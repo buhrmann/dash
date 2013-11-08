@@ -8,7 +8,7 @@
   {% if data %}
     <div class="page-header">
       <h1>Analysis <small>correlations ...</small></h1>
-      <p>A scatter plot and simple linear regression for a selected pair of run parameters. The third and fourth parameters are encoded in the size and color of dots respectively.</p>
+      <p>Scatter plot and linear regression for a selected pair of run parameters. The third and fourth parameters are encoded in the size and color of dots. Below, histograms are shown for the relevant variables.</p>
     </div>
     <div id="scatterplot">    	
       <div class="varselector"></div>
@@ -33,4 +33,5 @@
 	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>			
   <script type="text/javascript" src={{url_for('static', filename='js/d3scatter.js')}}></script>
   <script type="text/javascript">scatterFromJson("#scatterplot", {{data|safe}});</script>
+  <script type="text/javascript">histAll("#scatterplot", {{data|safe}});</script>
 {% endblock %}

@@ -81,10 +81,10 @@ datebars = function(id, dat, xlab, ylab) {
 	// Setup
 	var outFormat = d3.time.format("%Y-%m-%d");
 	var margin = {top: 10, right: 40, bottom: 100, left: 30};
-	var margin2 = {top: 430, right: 40, bottom: 20, left: 30}
+	var margin2 = {top: 330, right: 40, bottom: 20, left: 30}
 	var width = 900 - margin.left - margin.right;
-	var height = 500 - margin.top - margin.bottom;
-	var height2 = 500 - margin2.top - margin2.bottom;
+	var height = 400 - margin.top - margin.bottom;
+	var height2 = 400 - margin2.top - margin2.bottom;
 
 	renderLabels = 0;
 	include0 = true;
