@@ -6,30 +6,136 @@
 var runs;
 var byDate;
 var selectedElem = null;
-var dates = {};
+var dates;
+var selectedYear = null;
+var selectedMonth = null;
 var monthStr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-barsFromJson = function(elem, data) {
+var data;
+var x, x2, y, xlab, ylab, xAxis, yAxis;
+var width, height;
+var focus, bars;
+var brush;
 
+//----------------------------------------------------------------------
+// Wrapper for all things to be constructed in the corresponding layout
+//----------------------------------------------------------------------
+barsFromJson = function(elem, d) {
+
+	data = d;
 	data.forEach(function(d){ d.date = dateFormat.parse(d.date); });
 
 	// Data comes in sorted by date !
-	nestedDates = d3.nest()
+	dates = d3.nest()
 		.key(function(d) { return d.date.getFullYear(); })
 		.key(function(d) { return d.date.getMonth(); })
 		.rollup(function(leaves) { return leaves.length > 0; })
 		.map(data, d3.map);	
+		//.entries(data)
 
-	nestedDates.forEach(function(year, months) {
-    	dates[year] = months.keys().map(function(d) { return monthStr[parseInt(d)]; });
-	});
+	console.log(dates);
 
-	//d3.select("#date-selector").append
+	buildDateSelector();
 
 	runs = crossfilter(data);
 	byDate = runs.dimension(function(d) { return d.date; });
 
-	datebars(elem, data, 'date', 'distance');	
+	xlab = 'date';
+	ylab = 'distance';
+	datebars(elem, data, xlab, ylab);	
+}
+
+//-------------------------------------------------------------------
+classForYear = function(y){
+	var selected = y == selectedYear ? "selected" : "";
+	return "year " + selected; 
+}
+
+//-------------------------------------------------------------------
+classForMonth = function(m){
+	var selected = m == selectedMonth ? "selected" : "";
+	var inactive = "inactive";
+	if(selectedYear != null)
+		inactive = dates.get(selectedYear).keys().indexOf(m.toString()) < 0 ? "inactive" : "";
+	return "month " + selected + " " + inactive; 
+}
+
+//-------------------------------------------------------------------
+buildDateSelector = function(){
+
+	// Divs for years
+	d3.select("#date-selector .years").selectAll(".year").data(dates.keys()).enter()
+		.append("div")
+		.attr("class", function(d) { return classForYear(d); })
+		.text(function(d) { return d; } )
+		.on("click", function(d) { selectYear(d); });
+
+	// Divs for months
+	d3.select("#date-selector .months").selectAll(".month").data(d3.range(12)).enter()
+		.append("div")
+		.attr("class", function(d) { return classForMonth(d); })
+		.text(function(d) { return monthStr[d]; } )
+		.on("click", function(d) { if(d3.select(this).attr("class").indexOf("inactive") < 0) selectMonth(d); });
+}
+
+//-------------------------------------------------------------------
+selectYear = function(year){
+	selectedYear = year == selectedYear ? null : year;
+	selectedMonth = null;
+
+	var years = d3.select("#date-selector .years").selectAll(".year").data(dates.keys());
+	years.
+		attr("class", function(d) { return classForYear(d); });
+
+	var months = d3.select("#date-selector .months").selectAll(".month").data(d3.range(12));
+	months
+		.attr("class", function(d) { return classForMonth(d); })
+		.on("click", function(d) { if(d3.select(this).attr("class").indexOf("inactive") < 0) selectMonth(d); });
+
+	console.log(selectedYear, selectedMonth);
+
+	if (selectedYear != null){
+		var numMonths =  dates.get(selectedYear).keys().length;
+		var firstMonth = +dates.get(selectedYear).keys()[0];
+		var lastMonth = +dates.get(selectedYear).keys()[numMonths-1];
+
+		var start = new Date(selectedYear, firstMonth);
+		var end = new Date(selectedYear, lastMonth+1, 0); // day 0 is last day of previous month
+		if (data[0]['date'] > start)
+			start = data[0]['date'];
+		if (data[data.length-1]['date'] < end)
+			end = data[data.length-1]['date'];
+		brush.extent([start, end]);
+		d3.select(".brush").call(brush);
+		brushed(data);
+	}
+	else
+	{
+		brush.extent([data[0]['date'], data[data.length-1]['date']]);
+		d3.select(".brush").call(brush);
+		brushed(data);
+	}
+}
+
+//-------------------------------------------------------------------
+selectMonth = function(month){
+	selectedMonth = month == selectedMonth ? null : month;
+	months = d3.select("#date-selector .months").selectAll(".month").data(d3.range(12));
+	months.attr("class", function(d) { return classForMonth(d); });
+
+	console.log(selectedYear, selectedMonth);
+
+	if (selectedMonth != null){
+		var start = new Date(selectedYear, selectedMonth, 0);
+		var end = new Date(selectedYear, (+selectedMonth)+1, 0); // day 0 is last day of previous month
+		if (data[0]['date'] > start)
+			start = data[0]['date'];
+		if (data[data.length-1]['date'] < end)
+			end = data[data.length-1]['date'];
+		brush.extent([start, end]);
+		d3.select(".brush").call(brush);
+		brushed(data);
+	}
 }
 
 //-------------------------------------------------------------------
@@ -82,8 +188,8 @@ datebars = function(id, dat, xlab, ylab) {
 	var outFormat = d3.time.format("%Y-%m-%d");
 	var margin = {top: 10, right: 40, bottom: 100, left: 30};
 	var margin2 = {top: 330, right: 40, bottom: 20, left: 30}
-	var width = 900 - margin.left - margin.right;
-	var height = 400 - margin.top - margin.bottom;
+	width = 900 - margin.left - margin.right;
+	height = 400 - margin.top - margin.bottom;
 	var height2 = 400 - margin2.top - margin2.bottom;
 
 	renderLabels = 0;
@@ -99,20 +205,20 @@ datebars = function(id, dat, xlab, ylab) {
 	var first = d3.time.day.offset(dat[0][xlab], -1);
 	var last = d3.time.day.offset(dat[dat.length - 1][xlab], 1)
 	domain = [first, last]
-	var x = d3.time.scale().domain(domain).rangeRound([0, width]); 
+	x = d3.time.scale().domain(domain).rangeRound([0, width]); 
 
 	if (include0)
 		var ydomain = [0, d3.max(dat, function(d) { return d[ylab]; })];
 	else
 		var ydomain = d3.extent(dat, function(d) { return d[ylab]; });
-	var y = d3.scale.linear().domain(ydomain).nice().range([height, 0]);
+	y = d3.scale.linear().domain(ydomain).nice().range([height, 0]);
 
 	// Create axes
-	var xAxis = d3.svg.axis()
+	xAxis = d3.svg.axis()
 		.scale(x).orient("bottom")
 		.tickFormat(d3.time.format("%d %b"));
 
-	var yAxis = d3.svg.axis()
+	yAxis = d3.svg.axis()
 		.scale(y)
 		.orient("left");
 
@@ -128,7 +234,7 @@ datebars = function(id, dat, xlab, ylab) {
 		.attr("width", width)
 		.attr("height", height);
 
-	var focus = svg.append("g")
+	focus = svg.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	// Append axes
@@ -155,7 +261,7 @@ datebars = function(id, dat, xlab, ylab) {
 	focus.call(tip);		  
 
 	// Create marks
-	var bars = focus.selectAll(".bar")
+	bars = focus.selectAll(".bar")
 		.data(dat, function(d) {return d[xlab]; })
 		.enter().append("rect")
 		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
@@ -175,12 +281,12 @@ datebars = function(id, dat, xlab, ylab) {
 	// context brush
 	var context = 1;
 	if (context){
-		var x2 = d3.time.scale().domain(domain).rangeRound([0, width]); 
+		x2 = d3.time.scale().domain(domain).rangeRound([0, width]); 
 		var y2 = d3.scale.linear().domain(y.domain()).nice().range([height2, 0]);
 
 		var xAxis2 = d3.svg.axis().scale(x2).orient("bottom").tickFormat(d3.time.format("%d %b"));
 
-		var brush = d3.svg.brush().x(x2).on("brush", brushed);    
+		brush = d3.svg.brush().x(x2).on("brush", brushed);    
 
 		initialBrushExtent = 3; // months
 		brushlast = x.domain()[1];
@@ -329,6 +435,54 @@ datebars = function(id, dat, xlab, ylab) {
 		}
 	} // brushed()
 }
+
+function brushed(dat) {
+	byDate.filterRange(brush.extent());		
+	interval = byDate.top(Infinity);
+
+	d3.select("#numruns").text(interval.length);
+	d3.select("#totalkm").text(d3.sum(interval, function(d) {return d.distance;}).toFixed(2) );
+
+	xdomain = brush.empty() ? x2.domain() : brush.extent();
+	xdomain[0] = d3.time.day.offset(xdomain[0], -1);
+	xdomain[1] = d3.time.day.offset(xdomain[1], 1);
+	x.domain(xdomain);
+
+	if (include0)
+		ydomain = [0, d3.max(interval, function(d) { return d[ylab]; })];
+	else
+		ydomain = d3.extent(interval, function(d) { return d[ylab]; });
+	y.domain(ydomain).nice();
+
+
+	var N = d3.time.days(xdomain[0], xdomain[1]).length + 1;
+	if (N > 0){			
+		var w = (width / N) - 2;
+		if(w < 2) w = 2;
+		bars = focus.selectAll(".bar").data(dat, function(d) {return d[xlab]; });
+
+		bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
+			.attr("width", w);
+
+		bars.transition().duration(200)
+			.attr("height", function(d) { return height - y(d[ylab]); })
+			.attr("y", function(d) { return y(d[ylab]); })
+
+		bars.enter().append("rect")
+			.attr("x", function(d) { return x(d[xlab]) - w/2; })
+			.attr("y", function(d) { return y(d[ylab]); })
+			.attr("height", function(d) { return height - y(d[ylab]); })
+			.attr("width", w)
+			.attr("class", "bar")
+			.on('mouseover', function(d) { tip.show; hovered(d, d3.select(this)); } );			
+
+		bars.exit().remove();
+	}
+
+	focus.select(".x.axis").call(xAxis);
+	focus.select(".y.axis").call(yAxis);
+	
+} // brushed()
 
 
 //-------------------------------------------------------------------

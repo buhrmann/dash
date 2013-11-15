@@ -15,6 +15,7 @@ records = function(data) {
 	d3.select("#avgdist").select(".number").text(meanDist.toFixed(2));
 	d3.select("#avgspeed").select(".number").text(meanSpeed.toFixed(2));
 
+
 	// Build table
 	var n = 3;
 	emptyTable("#table", true, "listTable", "table table-hover table-condensed");

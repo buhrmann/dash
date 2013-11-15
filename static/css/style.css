@@ -16,6 +16,30 @@ body {
 	empty-cells: show; 
 }
 
+.year,
+.month {
+    float:left;
+    font-family: sans-serif;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #000;
+    padding: 3px;
+    border-radius: 3px;
+    color: black;
+    background: white;
+    cursor: pointer;
+}
+
+.year.selected,
+.month.selected{
+    color: red;
+    background: white;
+}  
+
+.month.inactive {
+    color: #aaa;
+    background: #eee;
+}
 
 .mybadge {
     font-family: 'Open Sans', sans-serif;
