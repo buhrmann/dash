@@ -17,6 +17,10 @@ var width, height;
 var focus, bars;
 var brush;
 
+var statsTabParent = "#stats .textdata";
+var detailTabParent = "#detail .textdata";
+var listTabParent = "#table .textdata";
+
 //----------------------------------------------------------------------
 // Wrapper for all things to be constructed in the corresponding layout
 //----------------------------------------------------------------------
@@ -179,6 +183,7 @@ gridlines = function(elem, arr, y, x1, x2){
    lines.exit().remove();
 }
 
+
 //-------------------------------------------------------------------
 // Bar chart for date indexed data
 //-------------------------------------------------------------------
@@ -194,10 +199,6 @@ datebars = function(id, dat, xlab, ylab) {
 
 	renderLabels = 0;
 	include0 = true;
-
-	var statsTabParent = "#stats .textdata";
-	var detailTabParent = "#detail .textdata";
-	var listTabParent = "#table .textdata";
 
 	// Create scales and axis
 	// Add one day before and after first and last data point
@@ -324,119 +325,40 @@ datebars = function(id, dat, xlab, ylab) {
 		emptyTable(listTabParent, true, "listTable", "table table-striped table-hover table-condensed");
 
 		// First update with initial extent
-		brushed();
-	}
-	
-	// Extract info for clicked bar
-	function hovered(run, elem) {
-
-		if(elem != selectedElem)
-		{
-			if(selectedElem != null)
-				selectedElem.classed("selected", false);
-
-			elem.classed("selected", true);
-			selectedElem = elem;
-		}
-
-		// Update link to single run view
-		var dateStr = dateFormat(run['date']);
-		lnk = "View in more detail."
-		d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
-
-		// Update single run tabular widget
-		tabulate([run], runMapper, runMapper.order, detailTabParent, false, false);
+		brushed(dat);
 	}
 
 	// Select last run initially
 	hovered(dat[dat.length - 1], null);
-
-	// Statistics helper
-	function statistic(data, stat, vars){
-		o = {};
-		for (var i=0; i < vars.length; i++){
-			o[vars[i]] = stat(data, function(d){ return d[vars[i]]});
-		}
-		return o;
-	}
-
-	// Brushing
-	function brushed() {
-		// Get data in brush range for statistics
-		byDate.filterRange(brush.extent());		
-		interval = byDate.top(Infinity);
-
-		d3.select("#numruns").text(interval.length);
-		d3.select("#totalkm").text(d3.sum(interval, function(d) {return d.distance;}).toFixed(2) );
-
-		xdomain = brush.empty() ? x2.domain() : brush.extent();
-		xdomain[0] = d3.time.day.offset(xdomain[0], -1);
-		xdomain[1] = d3.time.day.offset(xdomain[1], 1);
-		x.domain(xdomain);
-
-		if (include0)
-			ydomain = [0, d3.max(interval, function(d) { return d[ylab]; })];
-		else
-			ydomain = d3.extent(interval, function(d) { return d[ylab]; });
-		y.domain(ydomain).nice();
-
-
-		var N = d3.time.days(xdomain[0], xdomain[1]).length + 1;
-		if (N > 0){			
-			var w = (width / N) - 2;
-			if(w < 2) w = 2;
-			bars = focus.selectAll(".bar").data(dat, function(d) {return d[xlab]; });
-
-			bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
-				.attr("width", w);
-
-			bars.transition().duration(200)
-				.attr("height", function(d) { return height - y(d[ylab]); })
-				.attr("y", function(d) { return y(d[ylab]); })
-
-			bars.enter().append("rect")
-				.attr("x", function(d) { return x(d[xlab]) - w/2; })
-				.attr("y", function(d) { return y(d[ylab]); })
-				.attr("height", function(d) { return height - y(d[ylab]); })
-				.attr("width", w)
-				.attr("class", "bar")
-				.on('mouseover', function(d) { tip.show; hovered(d, d3.select(this)); } );			
-
-			bars.exit().remove();
-		}
-
-		focus.select(".x.axis").call(xAxis);
-		focus.select(".y.axis").call(yAxis);
-		
-		// Create statistics
-		if(interval.length > 0){
-			var vars = ["duration", "distance", "avgspeed", "maxspeed", "temp"];
-			var mus = statistic(interval, d3.mean, vars); mus["label"] = "Mean";
-			var maxs = statistic(interval, d3.max, vars); maxs["label"] = "Max";
-			var mins = statistic(interval, d3.min, vars); mins["label"] = "Min";
-			stats = [mus, mins, maxs];
-
-			tabulate(stats, runMapper, runMapper.statsorder, statsTabParent, true, true);
-			//tabulate(stats, runMapper, runMapper.statsorder, statsTabParent);
-
-			var listTab = tabulate(interval, runMapper, runMapper.order, listTabParent);
-			// Add linking behaviour
-			dateIdx = runMapper.order.indexOf("date");
-	    	listTab.selectAll("tr")
-	    		.on('click', function(d) { location.href=d[dateIdx];})
-	    		.on('mouseover', function(d) { d3.select(this).style("cursor", "pointer"); } );
-
-			//listTab.selectAll("tbody tr") 
-        	//	.sort(function(a, b) { return d3.descending(a[1], b[1]); });
-
-
-			// Grid lines
-			gridlines(focus, [mus['distance']], y, 0, width);
-		}
-	} // brushed()
 }
 
-function brushed(dat) {
+//-------------------------------------------------------------------
+// Select run by hovering over bar and present detail information
+//-------------------------------------------------------------------
+function hovered(run, elem) {
+
+	if(elem != selectedElem)
+	{
+		if(selectedElem != null)
+			selectedElem.classed("selected", false);
+
+		elem.classed("selected", true);
+		selectedElem = elem;
+	}
+
+	// Update link to single run view
+	var dateStr = dateFormat(run['date']);
+	lnk = "View in more detail."
+	d3.select("#detail a").text(lnk).attr("href", dateStr).style("cursor","pointer");
+
+	// Update single run tabular widget
+	tabulate([run], runMapper, runMapper.order, detailTabParent, false, false);
+}
+
+//-------------------------------------------------------------------
+// Brushing
+//-------------------------------------------------------------------
+function brushed() {
 	byDate.filterRange(brush.extent());		
 	interval = byDate.top(Infinity);
 
@@ -459,7 +381,7 @@ function brushed(dat) {
 	if (N > 0){			
 		var w = (width / N) - 2;
 		if(w < 2) w = 2;
-		bars = focus.selectAll(".bar").data(dat, function(d) {return d[xlab]; });
+		bars = focus.selectAll(".bar").data(data, function(d) {return d[xlab]; });
 
 		bars.attr("x", function(d) { return x(d[xlab]) - w/2; })
 			.attr("width", w);
@@ -482,135 +404,41 @@ function brushed(dat) {
 	focus.select(".x.axis").call(xAxis);
 	focus.select(".y.axis").call(yAxis);
 	
-} // brushed()
+	// Create statistics
+	if(interval.length > 0) {
+		var vars = ["duration", "distance", "avgspeed", "maxspeed", "temp"];
+		var mus = statistic(interval, d3.mean, vars); mus["label"] = "Mean";
+		var maxs = statistic(interval, d3.max, vars); maxs["label"] = "Max";
+		var mins = statistic(interval, d3.min, vars); mins["label"] = "Min";
+		stats = [mus, mins, maxs];
 
+		tabulate(stats, runMapper, runMapper.statsorder, statsTabParent, true, true);
+		//tabulate(stats, runMapper, runMapper.statsorder, statsTabParent);
 
-//-------------------------------------------------------------------
-// Bar chart for linear or ordinal data
-//-------------------------------------------------------------------
-bars = function(id, dat, scaleType) {
+		var listTab = tabulate(interval, runMapper, runMapper.order, listTabParent);
+		// Add linking behaviour
+		dateIdx = runMapper.order.indexOf("date");
+		listTab.selectAll("tr")
+			.on('click', function(d) { location.href=d[dateIdx];})
+			.on('mouseover', function(d) { d3.select(this).style("cursor", "pointer"); } );
 
-	renderLabels = 0
+		//listTab.selectAll("tbody tr") 
+		//	.sort(function(a, b) { return d3.descending(a[1], b[1]); });
 
-	// Create scales and axis
-	var x;
-	if (scaleType == "linear"){
-		x = d3.scale.linear()
-			.domain([0, d3.max(dat, function(d) { return d[0]; })])
-			.range([0, width]); 
-	}
-	else if (scaleType == "ordinal"){
-		x = d3.scale.ordinal()
-			.domain(dat.map(function(d) { return d[0]; }))
-			.rangeRoundBands([0, width], 0.1);	    
-	}
-
-	var y = d3.scale.linear()
-		.domain([0, d3.max(dat, function(d) { return d[1]; })])
-		.nice()
-		.range([height, 0]);
-
-	// Create axes
-	var xAxis = d3.svg.axis()
-		.scale(x)
-		.orient("bottom");
-
-	if (scaleType == "time")
-		xAxis.tickFormat(d3.time.format("%d %b"));
-
-	var yAxis = d3.svg.axis()
-		.scale(y)
-		.orient("left");
-
-	// Create svg container
-	var svg = d3.select(id).append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-		.append("g")
-		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-	// Append axes
-	svg.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0," + height + ")")
-		.call(xAxis);
-
-	// rotate axis labels
-	if (scaleType == "time"){
-		svg.selectAll(".x text")
-		  .attr("transform", function(d) {
-			 return "translate(" + this.getBBox().height*-2 + "," + this.getBBox().height + ")rotate(-45)";
-		 });	    
-	}
-
-	svg.append("g")
-		.attr("class", "y axis")
-		.call(yAxis)
-		.append("text")
-		  .attr("transform", "rotate(-90)")
-		  .attr("y", 6)
-		  .attr("dy", ".71em")
-		  .style("text-anchor", "end")
-		  .text("Distance");
-
-	// tool-tip
-	var tip = d3.tip()
-	  .attr('class', 'd3-tip')
-	  .offset([-10, 0])
-	  .html(function(d) {
-		return "<strong>Distance:</strong> <span style='color:red'>" + Math.round(100*d[1])/100 + "</span>";
-		});
-
-	svg.call(tip);	    
-
-	// Create marks
-	var bars = svg.selectAll(".bar")
-		.data(dat)
-		.enter().append("rect")
-		.on('mouseover', tip.show);
-		//.on('mouseout', tip.hide);
-
-	if (scaleType == "linear"){
-		var w = (width / dat.length) - 2;
-		bars.attr("x", function(d) {return x(d[0]) - w/2;})
-			.attr("width", w)
-			.attr("y", function(d) {return y(d[1]);})
-			.attr("height", function(d) {return height - y(d[1]);})
-			.attr("class", "bar");
-	}
-	else if (scaleType == "ordinal"){
-		bars.attr("x", function(d) { return x(d[0]); })
-			.attr("width", x.rangeBand())
-			.attr("y", function(d) { return y(d[1]); })
-			.attr("height", function(d) { return height - y(d[1]);})
-			.attr("class", "bar")
-	}
-
-	// Create labels
-	if (renderLabels) {
-
-		var labels = svg.selectAll(".text")
-		   .data(dat)
-		   .enter().append("text");
-
-		labels.text(function(d) { return Math.round(d[1] * 10) / 10; } )
-			.attr("font-family", "sans-serif")
-			.attr("font-size", "10px")
-			.attr("fill", "white")
-			.attr("text-anchor", "middle");
-
-		if (scaleType == "linear"){
-			var w = (width / dat.length) - 2;
-			labels.attr("x", function(d) { return x(d[0]); })
-				.attr("y", function(d) { return y(d[1]) + 12; })
-		}
-		else if (scaleType == "ordinal"){
-			labels.attr("x", function(d) { return x(d[0]) + x.rangeBand()/2; })
-				.attr("y", function(d) { return y(d[1]) + 12; })
-		}
+		// Grid lines
+		gridlines(focus, [mus['distance']], y, 0, width);
 	}
 }
 
-// bars("#bars", ranheights(20), "ordinal")
-// datebars("#datebars", randates(30), 'time', 'v')
+//-------------------------------------------------------------------
+// Statistics helper
+//-------------------------------------------------------------------
+function statistic(data, stat, vars){
+	o = {};
+	for (var i=0; i < vars.length; i++){
+		o[vars[i]] = stat(data, function(d){ return d[vars[i]]});
+	}
+	return o;
+}
+
 

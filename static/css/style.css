@@ -22,13 +22,21 @@ body {
     font-family: sans-serif;
     margin-right: 10px;
     margin-bottom: 10px;
-    border: 1px solid #000;
+    border: 1px solid #aaa;
     padding: 3px;
     border-radius: 3px;
     color: black;
     background: white;
     cursor: pointer;
 }
+
+.year:hover,
+.month:hover,
+.year.selected:hover,
+.month.selected:hover  {
+    background: #eee;
+}
+
 
 .year.selected,
 .month.selected{
@@ -38,7 +46,13 @@ body {
 
 .month.inactive {
     color: #aaa;
-    background: #eee;
+    background: #ddd;
+}
+
+.years,
+.months {
+    float:left;
+    margin-left: 20px;
 }
 
 .mybadge {
