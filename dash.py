@@ -1,7 +1,7 @@
 import os
 from urlparse import urlparse
 from flask import Flask, render_template, request, flash, url_for, session, redirect
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from sets import Set
 import json
@@ -49,7 +49,9 @@ def runs():
 		db.create_collection(COLL_NAME)
 		return db[COLL_NAME]
 
-runs = runs()		
+runs = runs()
+runs.ensure_index([('nid', ASCENDING)])
+runs.ensure_index([('date', ASCENDING)])
 
 # ------------------------------------------------------------------------
 def run(nid):
