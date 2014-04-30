@@ -178,8 +178,6 @@ gridlines = function(elem, arr, y, x1, x2){
 		.attr("dy", -4)
 		.attr("x", x2);
 
-		  
-
    lines.exit().remove();
 }
 

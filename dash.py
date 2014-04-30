@@ -11,7 +11,8 @@ import nike
 import stats
 
 # Configuration
-COLL_NAME = "runs"	
+RUNS_COL = "runs"
+STATS_COL = "stats"	
 DEBUG = True
 SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 USER_NAME = 'syngnz'
@@ -39,17 +40,17 @@ def connect():
 
 # Get collection of runs
 # ------------------------------------------------------------------------
-def runs():
+def getOrCreateCol(name):
 	db = connect()
-	if(COLL_NAME in db.collection_names()):
-		print "Retrieving runs collection"
-		return db[COLL_NAME]
-	else:
-		print "Creating runs collection"
-		db.create_collection(COLL_NAME)
-		return db[COLL_NAME]
+	if(not name in db.collection_names()):
+		db.create_collection(name)	
+	return db[name]
+	
 
-runs = runs()
+# Globals
+# ------------------------------------------------------------------------
+stats = getOrCreateCol(STATS_COL)
+runs = getOrCreateCol(RUNS_COL)
 runs.ensure_index([('nid', ASCENDING)])
 runs.ensure_index([('date', ASCENDING)])
 
@@ -94,10 +95,12 @@ def process(run, recalc=False):
 	stat = stats.stats(df)
 	run['stats'] = stat
 
-	# Add temperature
-	t = stats.temperature(run['date'], "placeholder")
-	if t is not None:
-		run['stats']['temp'] = t
+	# Add temperature etc...
+	addTemp(run)
+	addDateBucket(run)
+	
+	# Update time aggregated statistics
+	updateStats(run)
 
 	#getRuns().update({"_id" : nid}, {"$set" : {"stats" : stats, "gps" : rows}})		
 
@@ -117,6 +120,34 @@ def processAll(recalc=False):
 		i += 1
 
 # ------------------------------------------------------------------------
+def updateStats(run):
+	queryW = {"year" : run['date_bucket']['y'],  "month" : run['date_bucket']['m'], "week" : run['date_bucket']['w']}
+	queryM = {"year" : run['date_bucket']['y'],  "month" : run['date_bucket']['m']}
+	queryY = {"year" : run['date_bucket']['y']}
+	update = {
+		"$inc" : { "distance" : run['stats']['distance'], "num" : 1}
+	}
+	stats.weekly.update(queryW, update, upsert=True)
+	stats.monthly.update(queryM, update, upsert=True)
+	stats.annual.update(queryY, update, upsert=True)
+
+def updateAllStats():
+	stats.drop()
+	cursor = runs.find().sort("date",1)
+	for r in cursor:
+		updateStats(r)
+		print '.'
+
+def getMonthlyStats():
+	return [ s for s in stats.monthly.find({}, { "_id" : 0})]
+
+# ------------------------------------------------------------------------
+def addTemp(run):
+	t = stats.temperature(run['date'], "placeholder")
+	if t is not None:
+		run['stats']['temp'] = t
+
+# ------------------------------------------------------------------------
 def addTemps(redoall=False):
 	if redoall:
 		cursor = runs.find()
@@ -129,12 +160,40 @@ def addTemps(redoall=False):
 	i = 1
 	for run in cursor:
 		print "Retrieving temperature for run " + str(i) + " of " + str(n)
-		t = stats.temperature(run['date'], "placeholder")
-		print t
-		if t is not None:
-			run['stats']['temp'] = t
-			runs.save(run)		
-		i += 1		
+		addTemp(run)
+		runs.save(run)
+		i += 1	
+
+# ------------------------------------------------------------------------
+def addDateBucket(run):
+	d = run['date']
+	b = {"y" : d.year, "m" : d.month, "w" : d.isocalendar()[1]}
+	run['date_bucket'] = b
+
+# ------------------------------------------------------------------------
+def addDateBuckets(redoall=False):
+	if redoall:
+		cursor = runs.find()
+	else:
+		cursor = runs.find( {"$or": [
+			{"date_bucket" : {"$exists" : False}},
+			{"date_bucket" : None}
+			]} )
+	n = cursor.count()
+	for run in cursor:
+		addDateBucket(run)
+		runs.save(run)
+
+# ------------------------------------------------------------------------
+def statPerMonth(stat):
+	s = runs.aggregate(
+		[
+			{ "$project" : { "month_run" : { "$month" : "$date"} }},
+			{ "$group" : { "_id" : { "month_run" : "$month_run"}, "number" : { "$sum" : 1} }},
+			{ "$sort" : { "_id.month_run" : 1}}
+		]
+	)
+	return s
 
 # ------------------------------------------------------------------------
 def statsPeriod(s, e):
@@ -187,6 +246,12 @@ def show_stats():
 	s = statsAll()
 	js = json.dumps(s)
 	return render_template('stats.html', data=js)
+
+@app.route('/progress')
+def show_progress():
+	s = getMonthlyStats()
+	js = json.dumps(s)
+	return render_template('progress.html', data=js)
 
 @app.route('/runs/<date>')
 def show_run(date):

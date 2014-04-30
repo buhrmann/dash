@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
+{% endblock %}
+
+{% block content %}
+  {% if data %}
+    <div class="page-header">
+      <h1>Progress <small>over time</small></h1>
+      <p>Accumulated distance per month or week.</p>
+    </div>
+    <div id="progressplot"></div>
+  {% endif %}
+{% endblock %}
+
+{% block side1 %}
+  {% if data %}
+    <div id="detail">
+        <h3>Detail</h3>
+        <div class="textdata"></div> 
+      <a href=""></a>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block js_footer %}
+  <script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/d3.tip.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/sylvester.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>     
+  <script type="text/javascript" src={{url_for('static', filename='js/d3statsBars.js')}}></script>        
+  <script type="text/javascript" src={{url_for('static', filename='js/crossfilter.min.js')}}></script>  
+  <script type="text/javascript">barsFromStats("#progressplot", {{data|safe}})</script>
+{% endblock %}
