@@ -21,7 +21,7 @@ var height = 400 - margin.top - margin.bottom;
 buildDropDown = function(varid, selected, label){
 
 	d3.select(".varselector").append("div")
-		.attr("class", "col-md-2")
+		.attr("class", "col-sm-2")
 		.attr("style", "margin-bottom:20px;")
 		.text(label)
 		.append("div")

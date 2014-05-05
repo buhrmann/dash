@@ -43,7 +43,7 @@ datebars = function(id, dat, xlab, ylab) {
     var outFormat = d3.time.format("%Y-%m-%d");
     var margin = {top: 10, right: 40, bottom: 100, left: 30};
     var margin2 = {top: 330, right: 40, bottom: 20, left: 30}
-    width = 900 - margin.left - margin.right;
+    width = 800 - margin.left - margin.right;
     height = 400 - margin.top - margin.bottom;
     var height2 = 400 - margin2.top - margin2.bottom;
 
