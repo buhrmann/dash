@@ -242,6 +242,9 @@ updateScatter = function() {
 		.transition().duration(200)
 		.attr("cx", function(d) { return x(d[xLabSel]); })
 		.attr("cy", function(d) { return y(d[yLabSel]); })
+		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
+		.on('mouseout', tip.hide)
+		.on('click', function(d) { location.href=outFormat(d.date);})
 		.attr("r", function(d) { return z(d[zLabSel]); });
 
 	var dots = d3.selectAll(".dot")
@@ -330,7 +333,8 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 		.data(dat, function(d) { return d[xlab]; })
 		.enter().append("svg:circle")
 		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
-		//.on('mouseout', tip.hide)
+		.on('mouseout', tip.hide())
+		.on('click', function(d) { location.href=outFormat(d['date']);})
 		.attr("cx", function(d) { return x(d[xLabSel]); })
 		.attr("cy", function(d) { return y(d[yLabSel]); })
 		.attr("r", function(d) { return z(d[zLabSel]); })
@@ -350,7 +354,6 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 // Histogram for all variabels
 //-------------------------------------------------------------------
 histAll = function(id, dat) {
-
 	dat.forEach(function(d){ d.duration = d.duration / 3600; });
 	vars.forEach(function(v) { if (v != "maxspeed") hist(id, dat, v); });
 }
