@@ -30,12 +30,6 @@ svg .dot {
 svg .bar {
     fill: #3C75A3;    
     shape-rendering: crispEdges; 
-    <!--
-    -moz-transition: all 0.1s;
-    -o-transition: all 0.1s;
-    -webkit-transition: all 0.1s;
-    transition: all 0.1s;   
-    -->
 }
 
 svg .bar:hover, 

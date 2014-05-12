@@ -127,109 +127,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "dash.py",
-			"settings":
-			{
-				"buffer_size": 7261,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "templates/layout.html",
-			"settings":
-			{
-				"buffer_size": 4780,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "templates/runs.html",
-			"settings":
-			{
-				"buffer_size": 2274,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "static/js/d3bars.js",
-			"settings":
-			{
-				"buffer_size": 14046,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "static/css/style.css",
-			"settings":
-			{
-				"buffer_size": 1648,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "templates/run.html",
-			"settings":
-			{
-				"buffer_size": 1047,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "{% extends \"layout.html\" %}\n{% block head %}\n	{{ super() }}\n	<link rel=\"stylesheet\" href={{url_for('static', filename='css/d3.css')}}>\n{% endblock %}    \n\n{% block content %}\n  <div class=\"jumbotron\">\n    <h1><span class=\"text-primary\">Dash+</span> <small>visual display of running data</small></h1>\n    <p class=\"lead\">A python web application built with <a href=\"http://flask.pocoo.org/\">Flask</a> that imports <a href=\"http://nikeplus.nike.com/plus/\">Nike+</a> running data into a NoSQL database (<a href=\"http://www.mongodb.org/\">MongoDB</a>) and uses <a href=\"http://d3js.org/\">D3.js</a> to <a href=\"{{url_for(\"show_runs\")}}\">visualize</a> and <a href=\"{{url_for(\"show_stats\")}}\">analyze</a> it. Source code can be found on <a href=\"https://github.com/synergenz/dash\">github</a>.</p>\n  </div>\n\n  {% if data %}\n    <div class=\"page-header\">\n      <h1>Records <small>all time</small></h3>\n    </div>\n\n    <!-- badges -->\n    <div id=\"overview\">\n      <div class=\"row\">\n        <div class=\"col-md-3 col-sm-3 mybadge\" id=\"total\">          \n            <div class=\"mylabel\">total</div>\n            <span class=\"number\">23.7</span>\n            km\n        </div>\n        <div class=\"col-md-3 col-sm-3 mybadge\" id=\"farthest\">\n            <div class=\"mylabel\">farthest</div>\n            <span class=\"number\">23.7</span>\n            km\n        </div>\n        <div class=\"col-md-3 col-sm-3 mybadge\" id=\"avgdist\">\n            <div class=\"mylabel\">avg distance</div>\n            <span class=\"number\">23.7</span>\n            km\n        </div>\n        <div class=\"col-md-3 col-sm-3 mybadge\" id=\"avgspeed\">\n            <div class=\"mylabel\">avg speed</div>\n            <span class=\"number\">23.7</span>\n            km/h\n        </div>\n      </div> <!-- row -->\n    </div> <!-- div overview -->\n\n    <!-- last n -->\n    <div class=\"page-header\">\n      <h1>Last 3 runs <small>overview</small></h3>        \n    </div>\n    <div>\n      <div id=\"table\"></div>\n    </div>\n\n  {% endif %}\n{% endblock %}\n\n{% block js_footer %}\n	<script type=\"text/javascript\" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>\n  <script type=\"text/javascript\" src={{url_for('static', filename='js/d3table.js')}}></script>  \n  <script type=\"text/javascript\" src={{url_for('static', filename='js/overview.js')}}></script>\n  <script type=\"text/javascript\">records({{data|safe}});</script>\n{% endblock %}",
-			"file": "templates/overview.html",
-			"file_size": 2339,
-			"file_write_time": 1384364669000000,
-			"settings":
-			{
-				"buffer_size": 2374,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "static/js/overview.js",
-			"settings":
-			{
-				"buffer_size": 1334,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "static/js/d3scatter.js",
-			"settings":
-			{
-				"buffer_size": 13164,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": ".brush .extent {\n  stroke: #fff;\n  fill-opacity: .125;\n  shape-rendering: crispEdges;\n}\n\nsvg .axis path, \nsvg .axis line {\n	fill: none;\n	stroke: black;\n	shape-rendering: crispEdges;\n}\n\nsvg .y2 path,\nsvg .y2 line {\n    fill: none;\n    stroke: #3C75A3;\n    shape-rendering: crispEdges;\n}\n\nsvg .axis text {\n    font-family: sans-serif;\n    font-size: 10px;\n}\n\nsvg .dot {\n    fill: #3C75A3;        \n}\n\nsvg .bar {\n    fill: #3C75A3;    \n    shape-rendering: crispEdges; \n}\n\nsvg .bar:hover, \nsvg .bar.selected,\nsvg .dot:hover, \nsvg .dot.selected {\n    fill: #000;\n    cursor: pointer;\n}\n\n\nsvg path.line {\n  fill: none;\n  stroke: #000;\n  stroke-width: 1.5px;\n}\n\nsvg path.line2 {\n  stroke: #3C75A3;\n  stroke-width: 1.5px;\n}\n\npath.area {\n  fill: rgba(60,117, 163, 0.2);\n}\n\nsvg .trackpad {\n    fill: rgba(0,0,0,0);\n}\n\nsvg .tip {\n    fill: rgba(0,0,0,0.8);\n    stroke: rgba(0,0,0,0.8);\n    font-size: 14px;\n}\n\nsvg text.tip {\n    fill: white;\n    stroke: none;\n}\n\n.d3-tip {\n  line-height: 0.5;\n  font-size: 14px;\n  font-weight: normal;\n  padding: 12px;\n  background: rgba(0, 0, 0, 0.8);\n  color: #fff;\n  border-radius: 2px;\n}\n\n/* Creates a small triangle extender for the tooltip */\n.d3-tip:after {\n  box-sizing: border-box;\n  display: inline;\n  font-size: 10px;\n  width: 100%;\n  line-height: 1;\n  color: rgba(0, 0, 0, 0.8);\n  content: \"\\25BC\";\n  position: absolute;\n  text-align: center;\n}\n\n/* Style northward tooltips differently */\n.d3-tip.n:after {\n  margin: -1px 0 0 0;\n  top: 100%;\n  left: 0;\n}",
-			"file": "static/css/d3.css",
-			"file_size": 1628,
-			"file_write_time": 1383662888000000,
-			"settings":
-			{
-				"buffer_size": 1488,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "templates/stats.html",
-			"settings":
-			{
-				"buffer_size": 1485,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "static/js/d3table.js",
-			"settings":
-			{
-				"buffer_size": 4543,
-				"line_ending": "Unix",
-				"name": "d"
-			}
-		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -255,19 +152,31 @@
 	},
 	"file_history":
 	[
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3table.js",
+		"/Users/thomasbuhrmann/Code/dash/static/css/d3.css",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3scatter.js",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3bars.js",
+		"/Users/thomasbuhrmann/Code/dash/templates/stats.html",
+		"/Users/thomasbuhrmann/Code/dash/static/js/overview.js",
+		"/Users/thomasbuhrmann/Code/dash/templates/about.html",
+		"/Users/thomasbuhrmann/Code/dash/templates/overview.html",
+		"/Users/thomasbuhrmann/Code/dash/static/css/style.css",
+		"/Users/thomasbuhrmann/Code/dash/templates/progress.html",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3statsBars.js",
+		"/Users/thomasbuhrmann/Code/dash/templates/runs.html",
+		"/Users/thomasbuhrmann/Code/dash/templates/run.html",
+		"/Users/thomasbuhrmann/Code/dash/dash.py",
+		"/Users/thomasbuhrmann/Code/dash/templates/layout.html",
+		"/Users/thomasbuhrmann/Code/dash/templates/layout2.html",
+		"/Users/thomasbuhrmann/Code/RunR/gpsPlot.R",
 		"/Users/thomasbuhrmann/Code/dash/static/js/d3barssimple.js",
 		"/Users/thomasbuhrmann/Code/dash/static/js/d3dual.js",
 		"/Users/thomasbuhrmann/Code/dash/stats.py",
 		"/Users/thomasbuhrmann/Code/dash/nike.py",
-		"/Users/thomasbuhrmann/Code/dash/static/css/d3.css",
-		"/Users/thomasbuhrmann/Code/dash/static/css/style.css",
-		"/Users/thomasbuhrmann/Code/dash/dash.py",
 		"/Users/thomasbuhrmann/Code/PyRun/html/d3.html",
-		"/Users/thomasbuhrmann/Code/dash/templates/layout.html",
 		"/Users/thomasbuhrmann/Code/dash/README.md",
 		"/Users/thomasbuhrmann/Code/PyRun/dash.py",
 		"/Users/thomasbuhrmann/Code/PyRun/d3.py",
-		"/Users/thomasbuhrmann/Code/dash/static/js/d3bars.js",
 		"/Users/thomasbuhrmann/Code/dash/static/css/bootstrap-theme.min.css",
 		"/Users/thomasbuhrmann/Code/dash/templates/page.html",
 		"/Users/thomasbuhrmann/Code/PyRun/html/js/d3bars.js",
@@ -370,19 +279,7 @@
 		"/Users/thomasbuhrmann/Experiments/Arm/Output/12_11_29__20_29_35/EvoArmFixedOplp1234.xml",
 		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12SymRefxOnly.xml",
 		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpOnly1234.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv4SymRefxOnly.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpOnly2.xml",
-		"/Users/thomasbuhrmann/Experiments/Arm/Output/12_11_18__09_58_13/Evolvable.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12SymRefxOnly2.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12Sym.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12SymSym.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv1234.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv12OldMscl.xml",
-		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCAgentEvo.xml",
-		"/Users/thomasbuhrmann/Experiments/Arm/Output/12_06_10__02_25_24/EvoArmOplpInterSegMv12.xml",
-		"/Users/thomasbuhrmann/Experiments/Arm/Output/12_07_10__12_35_40/EvoArmOplpInterSegMv12.xml",
-		"/Users/thomasbuhrmann/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings"
+		"/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv4SymRefxOnly.xml"
 	],
 	"find":
 	{
@@ -437,340 +334,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "dash.py",
-					"settings":
-					{
-						"buffer_size": 7261,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								289,
-								289
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "templates/layout.html",
-					"settings":
-					{
-						"buffer_size": 4780,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1837,
-								1837
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "templates/runs.html",
-					"settings":
-					{
-						"buffer_size": 2274,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								740,
-								740
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "static/js/d3bars.js",
-					"settings":
-					{
-						"buffer_size": 14046,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								10735,
-								10735
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "static/css/style.css",
-					"settings":
-					{
-						"buffer_size": 1648,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								586,
-								586
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "templates/run.html",
-					"settings":
-					{
-						"buffer_size": 1047,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								186,
-								186
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "templates/overview.html",
-					"settings":
-					{
-						"buffer_size": 2374,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1780,
-								1780
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "static/js/overview.js",
-					"settings":
-					{
-						"buffer_size": 1334,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								814,
-								814
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "static/js/d3scatter.js",
-					"settings":
-					{
-						"buffer_size": 13164,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								11114,
-								11114
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "static/css/d3.css",
-					"settings":
-					{
-						"buffer_size": 1488,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								420,
-								426
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "templates/stats.html",
-					"settings":
-					{
-						"buffer_size": 1485,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								467,
-								467
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "static/js/d3table.js",
-					"settings":
-					{
-						"buffer_size": 4543,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3590,
-								3590
-							]
-						],
-						"settings":
-						{
-							"auto_name": "d",
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],

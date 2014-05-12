@@ -8,7 +8,7 @@ import json
 import datetime
 
 import nike
-import stats
+import stats as st
 
 # Configuration
 RUNS_COL = "runs"
@@ -87,12 +87,12 @@ def process(run, recalc=False):
 	# Expand the gps data
 	print "Processing run " + str(run['nid'])
 	gps = run['gps']
-	df = stats.gpsToDf(gps)
-	stats.expandGps(df)
+	df = st.gpsToDf(gps)
+	st.expandGps(df)
 	run['gps'] = [row[1].to_dict() for row in df.iterrows()]
 	
 	# Calculate statistics
-	stat = stats.stats(df)
+	stat = st.stats(df)
 	run['stats'] = stat
 
 	# Add temperature etc...
@@ -143,7 +143,7 @@ def getMonthlyStats():
 
 # ------------------------------------------------------------------------
 def addTemp(run):
-	t = stats.temperature(run['date'], "placeholder")
+	t = st.temperature(run['date'], "placeholder")
 	if t is not None:
 		run['stats']['temp'] = t
 
