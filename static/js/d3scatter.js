@@ -1,9 +1,12 @@
 var data;
 var vars = ["distance", "avgspeed", "duration", "maxspeed", "temp"];
+var outFormat = d3.time.format("%Y-%m-%d");
 var xLabSel = vars[0];
 var yLabSel = vars[1];
 var zLabSel = vars[2];
 var cLabSel = vars[4];
+
+var tip;
 
 var selectedElem = null;
 var detailTabParent = "#detail .textdata";
@@ -50,7 +53,7 @@ scatterFromJson = function(elem, dat) {
 	buildDropDown(2, zLabSel, "Size");
 	buildDropDown(3, cLabSel, "Color");
 
-	scatter(elem, data, xLabSel, yLabSel, zLabSel);	
+	scatter(elem, data);	
 }
 
 //-------------------------------------------------------------------
@@ -238,13 +241,10 @@ updateScatter = function() {
 	var c = d3.scale.linear().domain(cdomain).range(['blue','red']);
 
 	// update existing	
-	var dots = d3.selectAll(".dot")
-		.transition().duration(200)
+	var dots = d3.selectAll(".dot");//.data(data, function(d) { return d[xLabSel]; });
+	dots.transition().duration(200)
 		.attr("cx", function(d) { return x(d[xLabSel]); })
 		.attr("cy", function(d) { return y(d[yLabSel]); })
-		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
-		.on('mouseout', tip.hide)
-		.on('click', function(d) { location.href=outFormat(d.date);})
 		.attr("r", function(d) { return z(d[zLabSel]); });
 
 	var dots = d3.selectAll(".dot")
@@ -265,7 +265,7 @@ updateScatter = function() {
 //-------------------------------------------------------------------
 // Scatter selected variables and draws a regression line
 //-------------------------------------------------------------------
-scatter = function(id, dat, xlab, ylab, zlab) {
+scatter = function(id, dat) {
 
 	// Create scales and axis
 	if (includeX0)	
@@ -308,7 +308,7 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 		  .attr("x", width)
 		  .attr("class", "axisLabel")
 		  .style("text-anchor", "end")
-		  .text(runMapper[xlab]["label"]);
+		  .text(runMapper[xLabSel]["label"]);
 
 	svg.append("g")
 		.attr("class", "y axis")
@@ -319,22 +319,22 @@ scatter = function(id, dat, xlab, ylab, zlab) {
 		  .attr("dy", ".71em")
 		  .attr("class", "axisLabel")
 		  .style("text-anchor", "end")
-		  .text(runMapper[ylab]["label"]);
+		  .text(runMapper[yLabSel]["label"]);
 
 	// Create tooltip
 	tip = d3.tip().attr('class', 'd3-tip')
 		.offset([-10, 0])
-		.html(function(d) { return d[ylab].toFixed(2); });
+		.html(function(d) { return d[yLabSel].toFixed(2); });
 
 	svg.call(tip);
 
 	// Create marks
 	var dots = svg.selectAll(".dot")
-		.data(dat, function(d) { return d[xlab]; })
+		.data(dat, function(d) { return d[xLabSel]; })
 		.enter().append("svg:circle")
 		.on('mouseover', function(d) { tip.show(d); hovered(d, d3.select(this)); } )
-		.on('mouseout', tip.hide())
-		.on('click', function(d) { location.href=outFormat(d['date']);})
+		.on('mouseout', function(d) { tip.hide(); })
+		.on('click', function(d) { location.href = "runs/" + outFormat(d['date']); })
 		.attr("cx", function(d) { return x(d[xLabSel]); })
 		.attr("cy", function(d) { return y(d[yLabSel]); })
 		.attr("r", function(d) { return z(d[zLabSel]); })
