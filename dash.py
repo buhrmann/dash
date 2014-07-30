@@ -53,6 +53,7 @@ stats = getOrCreateCol(STATS_COL)
 runs = getOrCreateCol(RUNS_COL)
 runs.ensure_index([('nid', ASCENDING)])
 runs.ensure_index([('date', ASCENDING)])
+stats.ensure_index([('date', ASCENDING)])
 
 # ------------------------------------------------------------------------
 def run(nid):
@@ -125,14 +126,21 @@ def updateStats(run):
 	queryM = {"year" : run['date_bucket']['y'],  "month" : run['date_bucket']['m']}
 	queryY = {"year" : run['date_bucket']['y']}
 	update = {
-		"$inc" : { "distance" : run['stats']['distance'], "num" : 1}
+		"$inc" : { "distance" : run['stats']['distance'], 
+				   "avgspeed" : run['stats']['avgspeed'],
+				   "duration" : run['stats']['duration'],
+				   "temp"	  : run['stats']['temp'],
+				   "num" : 1}
 	}
 	stats.weekly.update(queryW, update, upsert=True)
 	stats.monthly.update(queryM, update, upsert=True)
 	stats.annual.update(queryY, update, upsert=True)
 
 def updateAllStats():
-	stats.drop()
+	stats.weekly.drop()
+	stats.monthly.drop()
+	stats.annual.drop()
+
 	cursor = runs.find().sort("date",1)
 	for r in cursor:
 		updateStats(r)

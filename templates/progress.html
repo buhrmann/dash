@@ -8,9 +8,13 @@
   {% if data %}
     <div class="page-header">
       <h1>Progress <small>over time</small></h1>
-      <p>Accumulated distance per month or week.</p>
+      <p>Monthly or weekly averages.</p>
     </div>
-    <div id="progressplot"></div>
+    <div id="progressplot">
+      <div class="row">
+        <div class="varselector"></div>
+      </div>
+    </div>
   {% endif %}
 {% endblock %}
 
