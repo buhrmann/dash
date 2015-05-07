@@ -14,7 +14,7 @@ import stats as st
 RUNS_COL = "runs"
 STATS_COL = "stats"	
 DEBUG = True
-SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+SECRET_KEY = os.environ['Secret_key']
 
 # Create app
 # ------------------------------------------------------------------------
