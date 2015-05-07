@@ -28,7 +28,8 @@ svg .dot {
 }
 
 svg .bar {
-    fill: #3C75A3;    
+    /*fill: #3C75A3;*/
+    fill: #3C75A3;
     shape-rendering: crispEdges; 
 }
 

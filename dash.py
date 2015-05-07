@@ -67,8 +67,9 @@ def ids():
 # ------------------------------------------------------------------------
 def insert(nid):
 	newrun = nike.getNikeRun(nid)
-	process(newrun)
-	runs.insert(newrun)
+	if newrun:
+		process(newrun)
+		runs.insert(newrun)
 
 # Runs on Nike+ that are not in the local database
 # ------------------------------------------------------------------------

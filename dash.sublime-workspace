@@ -127,22 +127,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "dash.py",
-			"settings":
-			{
-				"buffer_size": 9187,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "stats.py",
-			"settings":
-			{
-				"buffer_size": 2887,
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -168,26 +152,26 @@
 	},
 	"file_history":
 	[
-		"/Users/thomasbuhrmann/Code/dash/static/js/d3table.js",
-		"/Users/thomasbuhrmann/Code/dash/static/css/d3.css",
 		"/Users/thomasbuhrmann/Code/dash/static/js/d3scatter.js",
-		"/Users/thomasbuhrmann/Code/dash/static/js/d3bars.js",
+		"/Users/thomasbuhrmann/Code/dash/stats.py",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3statsBars.js",
 		"/Users/thomasbuhrmann/Code/dash/templates/stats.html",
+		"/Users/thomasbuhrmann/Code/dash/templates/progress.html",
+		"/Users/thomasbuhrmann/Code/dash/dash.py",
+		"/Users/thomasbuhrmann/Code/dash/static/css/d3.css",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3bars.js",
+		"/Users/thomasbuhrmann/Code/dash/static/js/d3table.js",
 		"/Users/thomasbuhrmann/Code/dash/static/js/overview.js",
 		"/Users/thomasbuhrmann/Code/dash/templates/about.html",
 		"/Users/thomasbuhrmann/Code/dash/templates/overview.html",
 		"/Users/thomasbuhrmann/Code/dash/static/css/style.css",
-		"/Users/thomasbuhrmann/Code/dash/templates/progress.html",
-		"/Users/thomasbuhrmann/Code/dash/static/js/d3statsBars.js",
 		"/Users/thomasbuhrmann/Code/dash/templates/runs.html",
 		"/Users/thomasbuhrmann/Code/dash/templates/run.html",
-		"/Users/thomasbuhrmann/Code/dash/dash.py",
 		"/Users/thomasbuhrmann/Code/dash/templates/layout.html",
 		"/Users/thomasbuhrmann/Code/dash/templates/layout2.html",
 		"/Users/thomasbuhrmann/Code/RunR/gpsPlot.R",
 		"/Users/thomasbuhrmann/Code/dash/static/js/d3barssimple.js",
 		"/Users/thomasbuhrmann/Code/dash/static/js/d3dual.js",
-		"/Users/thomasbuhrmann/Code/dash/stats.py",
 		"/Users/thomasbuhrmann/Code/dash/nike.py",
 		"/Users/thomasbuhrmann/Code/PyRun/html/d3.html",
 		"/Users/thomasbuhrmann/Code/dash/README.md",
@@ -350,63 +334,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "dash.py",
-					"settings":
-					{
-						"buffer_size": 9187,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7993,
-								7993
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 4021.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "stats.py",
-					"settings":
-					{
-						"buffer_size": 2887,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 148.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
