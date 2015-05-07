@@ -1,6 +1,6 @@
 import os
 from urlparse import urlparse
-from flask import Flask, render_template, request, flash, url_for, session, redirect
+from flask import Flask, render_template, request, flash, url_for, session, redirect, send_from_directory
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from sets import Set
@@ -15,8 +15,6 @@ RUNS_COL = "runs"
 STATS_COL = "stats"	
 DEBUG = True
 SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-USER_NAME = 'syngnz'
-PASSWORD = 'inform'
 
 # Create app
 # ------------------------------------------------------------------------
@@ -296,9 +294,9 @@ def drop_runs():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USER_NAME']:
+        if request.form['username'] != os.environ['Nike_user']:
             error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        elif request.form['password'] != os.environ['Nike_pass']:
             error = 'Invalid password'
         else:
             session['logged_in'] = True

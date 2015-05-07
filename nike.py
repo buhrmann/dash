@@ -1,3 +1,4 @@
+import os
 import json, httplib, ssl, urllib2, subprocess
 import datetime
 import sys
@@ -9,10 +10,8 @@ baseurl = "https://api.nike.com/v1/me/sport/activities/"
 def get_access_token():
 	""" Fetch access token via curl. Unfortunately urrlib and requests don't do sslv3 in this version """
 
-	u = 'thomas.buehrmann@gmail.com'
-	p = 'W))ten75'
 	cmd = "curl 'https://developer.nike.com/services/login' --data-urlencode username='%s' --data-urlencode password='%s'"
-	cmd = cmd % (u, p)
+	cmd = cmd % (os.environ['Nike_user'], os.environ['Nike_pass'])
 	str = subprocess.check_output(cmd, shell=True)
 	js = json.loads(str)
 	return js['access_token']
