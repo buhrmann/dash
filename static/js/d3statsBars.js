@@ -15,7 +15,7 @@ var focus, context, bars;
 var brush;
 
 var statsTabParent = "#stats .textdata";
-var vars = ["distance", "avgspeed", "duration", "temp"];
+var vars = ["distance_total", "distance", "avgspeed", "duration", "temp"];
 ylab = vars[0];
 
 //-------------------------------------------------------------------
@@ -42,9 +42,9 @@ buildDropDown = function(varid, selected, label){
 //-------------------------------------------------------------------
 // 
 //-------------------------------------------------------------------
-selectVars = function(){
-    var val = this.options[this.selectedIndex].value;
-    ylab = val;  
+selectVars = function(){    
+    ylab = this.options[this.selectedIndex].value;
+    tip.html(function(d) { return d[ylab].toFixed(2); });
     updateBars();
 }
 
@@ -59,9 +59,10 @@ barsFromStats = function(elem, d) {
     data.forEach(function(d){ 
         console.log(d.year, d.month, d.num, d.distance, d.avgspeed, d.duration, d.temp);
         d.date = new Date(d.year, d.month-1); 
+        d.distance_total = d.distance
         d.distance = d.distance / d.num;
         d.avgspeed = d.avgspeed / d.num;
-        d.duration = d.duration / d.num;
+        d.duration = d.duration / 3600 / d.num;
         d.temp = d.temp / d.num;
     });
 
@@ -92,8 +93,10 @@ datebars = function(id, dat, xlab, ylab) {
 
     // Create scales and axis
     // Add one day before and after first and last data point
-    var first = d3.time.month.offset(dat[0][xlab], -1);
-    var last  = d3.time.month.offset(dat[dat.length - 1][xlab], 1)
+    var first = d3.min(dat, function(d) { return d.date}) 
+    first = d3.time.month.offset(first, -1);
+    var last = d3.max(data, function(d) { return d.date}) 
+    last  = d3.time.month.offset(last, 1)
     var xdomain = [first, last]
     x = d3.time.scale().domain(xdomain).rangeRound([0, width]); 
 

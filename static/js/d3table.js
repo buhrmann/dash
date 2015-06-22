@@ -5,6 +5,7 @@ var dateFormat = d3.time.format("%Y-%m-%d");
 var runMapper = new Object();
 runMapper.label = {"label" : "", "mapper" : function(x) { return x;} };
 runMapper.distance = {"label" : "Distance", "mapper" : function(x) { return x.toFixed(2);} };
+runMapper.distance_total = {"label" : "Distance total", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.duration = {"label" : "Duration", "mapper" : function(x) { return timeFormat(new Date(x*1000));} };
 runMapper.avgspeed = {"label" : "Avg Speed", "mapper" : function(x) { return x.toFixed(2);} };
 runMapper.maxspeed = {"label" : "Max Speed", "mapper" : function(x) { return x.toFixed(2);} };
