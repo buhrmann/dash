@@ -2,9 +2,7 @@
 {% block head %}
 	{{ super() }}
 	<link rel="stylesheet" href={{url_for('static', filename='css/d3.css')}}>
-  <link rel="stylesheet" href="https://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css"/>
-  <script src="https://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
-  <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js"></script>
+  <link rel="stylesheet" href={{url_for('static', filename='css/leaflet.css')}}>
 {% endblock %}
 
 {% block content %}
@@ -31,6 +29,8 @@
 
 {% block js_footer %}
 	<script type="text/javascript" src={{url_for('static', filename='js/d3.v3.min.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/leaflet.js')}}></script>
+  <script type="text/javascript" src={{url_for('static', filename='js/tile.stamen.js')}}></script>
 	<script type="text/javascript" src={{url_for('static', filename='js/d3table.js')}}></script>		
   <script type="text/javascript" src={{url_for('static', filename='js/d3dual.js')}}></script> 
   <script type="text/javascript">dualFromJson("#duallines", {{data|safe}});</script>
