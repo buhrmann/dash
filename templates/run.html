@@ -39,9 +39,9 @@
     var coords = data.stats.location
     var map = L.map('map').setView([coords.latitude, coords.longitude],14);
     
-    /*L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);*/
+    // L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', {
+    //   attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    //   }).addTo(map);
 
     var layer = new L.StamenTileLayer("toner-lite");
     map.addLayer(layer);
